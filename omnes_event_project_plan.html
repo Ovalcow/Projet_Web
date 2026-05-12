@@ -1,0 +1,207 @@
+
+<style>
+  .phase { margin-bottom: 20px; border-left: 3px solid var(--color-border-tertiary); padding-left: 16px; }
+  .phase-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+  .phase-sub { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 10px; }
+  .person { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 12px; }
+  .p1 { background: #EEEDFE; color: #3C3489; } .p2 { background: #E1F5EE; color: #085041; }
+  .p3 { background: #FAECE7; color: #712B13; } .p4 { background: #E6F1FB; color: #0C447C; }
+  @media(prefers-color-scheme:dark){
+    .p1{background:#3C3489;color:#CECBF6} .p2{background:#085041;color:#9FE1CB}
+    .p3{background:#712B13;color:#F5C4B3} .p4{background:#0C447C;color:#B5D4F4}
+  }
+  .task-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media(max-width:500px){ .task-grid { grid-template-columns: 1fr; } }
+  .task { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 12px; }
+  .task-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .task-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  .task-tags { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .tech { font-size: 10px; padding: 1px 6px; border-radius: 8px; background: var(--color-background-tertiary); color: var(--color-text-tertiary); }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .sep { height: 1px; background: var(--color-border-tertiary); margin: 16px 0; }
+  .priority { font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: 6px; }
+  .prio-high { background: var(--color-background-danger); color: var(--color-text-danger); }
+  .prio-med { background: var(--color-background-warning); color: var(--color-text-warning); }
+  .prio-low { background: var(--color-background-info); color: var(--color-text-info); }
+</style>
+
+<h2 class="sr-only">Plan de projet OmnesEvent avec répartition des tâches pour 4 personnes</h2>
+
+<div class="legend">
+  <span class="person p1"><i class="ti ti-user" aria-hidden="true"></i> P1 — Auth & admin</span>
+  <span class="person p2"><i class="ti ti-user" aria-hidden="true"></i> P2 — Événements</span>
+  <span class="person p3"><i class="ti ti-user" aria-hidden="true"></i> P3 — Réservations</span>
+  <span class="person p4"><i class="ti ti-user" aria-hidden="true"></i> P4 — Front & intégration</span>
+</div>
+
+<div class="phase" style="border-color: #888780;">
+  <div class="phase-title"><i class="ti ti-flag" aria-hidden="true"></i> Phase 0 — Fondations communes</div>
+  <div class="phase-sub">Semaine 1 · Tout le monde ensemble · <span class="priority prio-high">critique</span></div>
+  <div class="task-grid">
+    <div class="task">
+      <div class="task-name">Schéma BDD MySQL</div>
+      <div class="task-desc">Tables : utilisateurs, evenements, reservations, categories. Clés étrangères et contraintes.</div>
+      <div class="task-tags"><span class="tech">SQL</span><span class="tech">MySQL</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Architecture fichiers</div>
+      <div class="task-desc">Arborescence : includes/ (header, footer, db.php), assets/ (css, js, img), pages/.</div>
+      <div class="task-tags"><span class="tech">PHP</span><span class="tech">Structure</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Repo Git + branches</div>
+      <div class="task-desc">Dépôt GitHub/GitLab, branche par personne ou par bloc, conventions de commit.</div>
+      <div class="task-tags"><span class="tech">Git</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Charte graphique</div>
+      <div class="task-desc">Palette de couleurs, typographie, maquette wireframe des pages principales.</div>
+      <div class="task-tags"><span class="tech">CSS</span><span class="tech">Figma</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="phase" style="border-color: #7F77DD;">
+  <div class="phase-title"><span class="person p1">P1</span> Bloc A — Authentification & comptes</div>
+  <div class="phase-sub">Semaines 2-3 · <span class="priority prio-high">critique</span> — Tout le reste en dépend</div>
+  <div class="task-grid">
+    <div class="task">
+      <div class="task-name">Inscription</div>
+      <div class="task-desc">Formulaire avec nom, email, mot de passe, choix du rôle (participant/organisateur). Validation côté serveur, hash du mot de passe.</div>
+      <div class="task-tags"><span class="tech">PHP</span><span class="tech">MySQL</span><span class="tech">POST</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Connexion / déconnexion</div>
+      <div class="task-desc">Vérification des identifiants, session PHP, redirection selon le rôle, destruction de session.</div>
+      <div class="task-tags"><span class="tech">Sessions</span><span class="tech">PHP</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Page Mon Profil</div>
+      <div class="task-desc">Affichage et modification des infos personnelles (nom, email, photo). Changement de mot de passe.</div>
+      <div class="task-tags"><span class="tech">CRUD</span><span class="tech">Upload</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Panel administrateur</div>
+      <div class="task-desc">Validation des comptes organisateurs, suppression de comptes, modération d'événements.</div>
+      <div class="task-tags"><span class="tech">PHP</span><span class="tech">Droits</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="phase" style="border-color: #1D9E75;">
+  <div class="phase-title"><span class="person p2">P2</span> Bloc B — Événements (CRUD)</div>
+  <div class="phase-sub">Semaines 2-4 · <span class="priority prio-high">critique</span> — Le cœur du projet</div>
+  <div class="task-grid">
+    <div class="task">
+      <div class="task-name">Création d'événement</div>
+      <div class="task-desc">Formulaire : titre, description, date/heure, lieu, catégorie, jauge max, upload d'affiche (image).</div>
+      <div class="task-tags"><span class="tech">PHP</span><span class="tech">Upload</span><span class="tech">POST</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Page d'accueil / catalogue</div>
+      <div class="task-desc">Liste des événements à venir, cartes visuelles avec affiche, date, lieu et places restantes.</div>
+      <div class="task-tags"><span class="tech">PHP</span><span class="tech">MySQL</span><span class="tech">CSS</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Recherche & filtres</div>
+      <div class="task-desc">Formulaire de recherche par mot-clé, filtre par date, catégorie (Soirée, Sport, Culture) et association.</div>
+      <div class="task-tags"><span class="tech">GET</span><span class="tech">SQL WHERE</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Modification & suppression</div>
+      <div class="task-desc">L'organisateur peut éditer ou annuler ses propres événements. L'admin peut supprimer n'importe lequel.</div>
+      <div class="task-tags"><span class="tech">CRUD</span><span class="tech">Droits</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="phase" style="border-color: #D85A30;">
+  <div class="phase-title"><span class="person p3">P3</span> Bloc C — Réservation & billets</div>
+  <div class="phase-sub">Semaines 3-4 · <span class="priority prio-high">critique</span> — Dépend des blocs A + B</div>
+  <div class="task-grid">
+    <div class="task">
+      <div class="task-name">Inscription à un événement</div>
+      <div class="task-desc">Bouton « S'inscrire », vérification de la jauge, blocage si complet, enregistrement en BDD.</div>
+      <div class="task-tags"><span class="tech">PHP</span><span class="tech">MySQL</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Page Mes Billets</div>
+      <div class="task-desc">Historique pour le participant : événements à venir et passés, bouton d'annulation.</div>
+      <div class="task-tags"><span class="tech">PHP</span><span class="tech">Sessions</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Dashboard organisateur</div>
+      <div class="task-desc">Tableau de bord : liste des inscrits par événement, compteur de places, validation de présence.</div>
+      <div class="task-tags"><span class="tech">PHP</span><span class="tech">SQL JOIN</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Annulation & désistement</div>
+      <div class="task-desc">Annulation par le participant, libération de la place, mise à jour du compteur en temps réel.</div>
+      <div class="task-tags"><span class="tech">CRUD</span><span class="tech">DELETE</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="phase" style="border-color: #378ADD;">
+  <div class="phase-title"><span class="person p4">P4</span> Bloc D — Front-end & intégration</div>
+  <div class="phase-sub">Semaines 2-5 · <span class="priority prio-med">continu</span> — Travail en parallèle avec tous</div>
+  <div class="task-grid">
+    <div class="task">
+      <div class="task-name">Design responsive mobile first</div>
+      <div class="task-desc">CSS responsive, media queries, navigation mobile (burger menu), accessibilité basique.</div>
+      <div class="task-tags"><span class="tech">CSS</span><span class="tech">HTML</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Header / Footer / Navigation</div>
+      <div class="task-desc">Composants PHP réutilisables (include), menu adapté au rôle connecté, fil d'Ariane.</div>
+      <div class="task-tags"><span class="tech">PHP include</span><span class="tech">CSS</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Interactions JavaScript</div>
+      <div class="task-desc">Validation côté client des formulaires, animations, retours visuels (alertes, modales, compteurs).</div>
+      <div class="task-tags"><span class="tech">JS</span><span class="tech">jQuery</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name">Intégration & déploiement</div>
+      <div class="task-desc">Merge des branches Git, résolution de conflits, tests globaux, mise en production sur serveur.</div>
+      <div class="task-tags"><span class="tech">Git</span><span class="tech">Serveur</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="phase" style="border-color: #639922;">
+  <div class="phase-title"><i class="ti ti-sparkles" aria-hidden="true"></i> Phase bonus — Fonctionnalités avancées</div>
+  <div class="phase-sub">Semaine 5+ · Uniquement si le MVP est solide · <span class="priority prio-low">bonus</span></div>
+  <div class="task-grid">
+    <div class="task">
+      <div class="task-name"><span class="person p1" style="font-size:10px">P1</span> QR code & paiement</div>
+      <div class="task-desc">Génération de QR code par billet (lib PHP). Simulation paiement Stripe en mode test.</div>
+      <div class="task-tags"><span class="tech">API</span><span class="tech">PHP</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name"><span class="person p3" style="font-size:10px">P3</span> File d'attente</div>
+      <div class="task-desc">Liste d'attente en cas de jauge atteinte. Inscription auto du premier en cas de désistement.</div>
+      <div class="task-tags"><span class="tech">PHP</span><span class="tech">SQL</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name"><span class="person p2" style="font-size:10px">P2</span> Calendrier interactif</div>
+      <div class="task-desc">Vue calendrier dynamique (FullCalendar.js ou similaire) pour naviguer les événements.</div>
+      <div class="task-tags"><span class="tech">JS</span><span class="tech">API</span></div>
+    </div>
+    <div class="task">
+      <div class="task-name"><span class="person p4" style="font-size:10px">P4</span> Carte interactive</div>
+      <div class="task-desc">Intégration Leaflet/Google Maps pour afficher le lieu de chaque événement sur une carte.</div>
+      <div class="task-tags"><span class="tech">JS</span><span class="tech">API Maps</span></div>
+    </div>
+  </div>
+</div>
