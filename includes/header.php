@@ -5,12 +5,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><?= isset($pageTitle) ? e($pageTitle) : 'OmnesEvent' ?></title>
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo time(); ?>" />
 </head>
 <body>
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="/pages/index.php">OmnesEvent</a>
+      <a class="brand" href="/pages/index.php"><img class="logo" src="/assets/images/logo_omneseducation.webp" alt="Logo Omnes Education" /></a>
       <nav class="nav">
         <a class="nav-link" href="/pages/events.php">Événements</a>
         <a class="nav-link" href="/pages/profile.php">Mon profil</a>

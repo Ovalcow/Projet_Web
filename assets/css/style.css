@@ -1,6 +1,6 @@
 :root{
   --bg:#0b1220;
-  --card:#111a2e;
+  --card:rgb(23,8,51);
   --text:#e7ecff;
   --muted:#a9b4d0;
   --primary:#6d5efc;
@@ -20,7 +20,7 @@ body{
 
 .site-header{
   position: sticky; top:0; z-index:10;
-  background: rgba(11,18,32,.8);
+  background: var(--card);/* même couleur que le logo pour un effet de continuité */
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
 }
@@ -54,7 +54,13 @@ body{
 .event-capacity{ margin:0; font-size: 13px; color: var(--muted); }
 .event-meta .btn{ margin-top: 8px; width: fit-content; }
 
-.site-footer{ border-top: 1px solid var(--border); padding: 18px 0; color: var(--muted); }
+.site-footer{ 
+  border-top: 1px solid var(--border);
+  background: var(--card);
+  padding: 18px 0; 
+  color: var(--muted); 
+  text-align:center; 
+}
 
 @media(min-width: 760px){
   .events-grid{ grid-template-columns: 1fr 1fr; }
@@ -62,4 +68,3 @@ body{
   .event-affiche{ width:160px; height:160px; }
   .search-form{ grid-template-columns: 1.2fr .7fr .9fr .9fr auto; align-items:end; }
 }
-
