@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
+require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/db.php';
 
-// Phase 0 : affichage catalogue + filtres (pas encore d’auth, pas encore de CRUD réservation).
 
-$currentUser = null; // placeholder phase 0
 $pageTitle = 'Événements';
 
 // Filtres MVP

@@ -1,14 +1,63 @@
 <?php declare(strict_types=1);
-require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../includes/functions.php';
 
-// Phase A : inscription à implémenter.
-$currentUser = null;
 $pageTitle = 'Inscription';
 
 $errors = [];
 
+$flash = flash_get();
+if (!empty($flash['error'])) {
+  $errors[] = (string)$flash['error'];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $errors[] = "Inscription non implémentée (Phase A).";
+  $nom = trim((string)($_POST['nom'] ?? ''));
+  $email = strtolower(trim((string)($_POST['email'] ?? '')));
+  $password = (string)($_POST['password'] ?? '');
+  $role = (string)($_POST['role'] ?? '');
+
+  if ($nom === '' || mb_strlen($nom) > 100) {
+    $errors[] = 'Nom invalide.';
+  }
+  if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errors[] = 'Email invalide.';
+  }
+  if (mb_strlen($password) < 8) {
+    $errors[] = 'Mot de passe trop court (min 8 caractères).';
+  }
+  if (!in_array($role, ['participant', 'organisateur'], true)) {
+    $errors[] = 'Rôle invalide.';
+  }
+
+  if (!$errors) {
+    // Vérifie unicité email
+    $exists = db_single('SELECT id FROM users WHERE email = :email', [':email' => $email]);
+    if ($exists) {
+      $errors[] = 'Un compte existe déjà pour cet email.';
+    } else {
+      $hash = password_hash($password, PASSWORD_BCRYPT);
+      $associationId = null; // TODO Phase B si vous liez une association
+      $validated = 0;
+
+      db_execute(
+        "INSERT INTO users (role, association_id, nom, email, password_hash, photo_path, is_organisateur_validated)
+         VALUES (:role, :association_id, :nom, :email, :password_hash, NULL, :validated)",
+        [
+          ':role' => $role,
+          ':association_id' => $associationId,
+          ':nom' => $nom,
+          ':email' => $email,
+          ':password_hash' => $hash,
+          ':validated' => $validated,
+        ]
+      );
+
+      // Redirection vers connexion
+      header('Location: /pages/login.php');
+      exit;
+    }
+  }
 }
 
 require_once __DIR__ . '/../includes/header.php';

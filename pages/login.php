@@ -1,19 +1,48 @@
 <?php declare(strict_types=1);
-require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../includes/functions.php';
 
-$currentUser = null;
 $pageTitle = 'Connexion';
 
-// Phase A : auth à implémenter. Pour l’instant, squelette UI.
 $errors = [];
 
+$flash = flash_get();
+if (!empty($flash['error'])) {
+  $errors[] = (string)$flash['error'];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  // placeholder
-  $errors[] = "Authentification non implémentée (Phase A).";
+  $email = strtolower(trim((string)($_POST['email'] ?? '')));
+  $password = (string)($_POST['password'] ?? '');
+
+  if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errors[] = 'Email invalide.';
+  } else {
+    $user = db_single(
+      "SELECT id, role, association_id, password_hash, nom, email, photo_path, is_organisateur_validated
+       FROM users WHERE email = :email",
+      [':email' => $email]
+    );
+
+    if (!$user || empty($user['password_hash']) || !password_verify($password, (string)$user['password_hash'])) {
+      $errors[] = 'Identifiants invalides.';
+    } else {
+      // Login OK
+      @session_start();
+      $_SESSION['user_id'] = (int)$user['id'];
+      $_SESSION['role'] = (string)$user['role'];
+      $_SESSION['association_id'] = $user['association_id'] !== null ? (int)$user['association_id'] : null;
+
+      // Redirection simple : profil
+      header('Location: /pages/profile.php');
+      exit;
+    }
+  }
 }
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
+
 
 <section class="container">
   <h1>Connexion</h1>
@@ -35,6 +64,11 @@ require_once __DIR__ . '/../includes/header.php';
     </label>
 
     <button class="btn btn-secondary" type="submit">Se connecter</button>
+
+    <p style="margin: 10px 0 0; color: var(--muted); font-size: 13px;">
+      Pas encore de compte ?
+      <a href="/pages/register.php" style="color: var(--primary2); text-decoration: none; font-weight: 700;">Créer un compte</a>
+    </p>
   </form>
 </section>
 

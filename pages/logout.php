@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
-require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/init.php';
 
-// Phase A : vraie gestion de session à implémenter.
-// Pour l’instant, on redirige vers l’accueil.
+// Déconnexion : purge session et redirection.
 @session_start();
 $_SESSION = [];
 @session_destroy();

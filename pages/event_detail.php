@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
-require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/init.php';
 
-// Phase 0 : détail + affichage, sans inscription réelle.
-$currentUser = null; // placeholder
+// Détail événement.
 $pageTitle = 'Détail événement';
 
 $id = (int)($_GET['id'] ?? 0);
