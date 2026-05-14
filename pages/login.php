@@ -1,42 +1,93 @@
-<?php declare(strict_types=1);
-require_once __DIR__ . '/../includes/db.php';
+<?php
+session_start();
+include('../includes/db.php');
 
+// Vérifier si déjà connecté → redirection vers accueil
 $currentUser = null;
-$pageTitle = 'Connexion';
-
-// Phase A : auth à implémenter. Pour l’instant, squelette UI.
-$errors = [];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  // placeholder
-  $errors[] = "Authentification non implémentée (Phase A).";
+if (isset($_SESSION['user_id'])) {
+    $requete = $bdd->prepare('SELECT id, nom, email, role FROM users WHERE id = ?');
+    $requete->execute(array($_SESSION['user_id']));
+    $currentUser = $requete->fetch();
+    $requete->closeCursor();
 }
 
-require_once __DIR__ . '/../includes/header.php';
+if ($currentUser) {
+    header('Location: /pages/index.php');
+    exit();
+}
+
+// Traitement du formulaire (méthode POST - TP9)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    if (isset($_POST['email'], $_POST['mot_de_passe'])) {
+
+        $email = htmlspecialchars($_POST['email']);
+        $mdp   = $_POST['mot_de_passe'];
+
+        // Requête préparée (cours slide 84)
+        $requete = $bdd->prepare('SELECT id, nom, email, password_hash, role FROM users WHERE email = :email');
+        $requete->execute(array('email' => $email));
+        $user = $requete->fetch();
+        $requete->closeCursor();
+
+        if ($user && password_verify($mdp, $user['password_hash'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['tentatives'] = 0;
+            header('Location: /pages/index.php');
+            exit();
+        }
+
+        // TP10 : compteur de tentatives
+        if (!isset($_SESSION['tentatives'])) {
+            $_SESSION['tentatives'] = 0;
+        }
+        $_SESSION['tentatives']++;
+
+        // TP10 : sleep(5) après 3 tentatives
+        if ($_SESSION['tentatives'] >= 3) {
+            sleep(5);
+            $_SESSION['tentatives'] = 0;
+        }
+
+        header('Location: /pages/login.php?erreur=1');
+        exit();
+
+    } else {
+        header('Location: /pages/login.php?erreur=1');
+        exit();
+    }
+}
+
+$pageTitle = 'Connexion';
+include('../includes/header.php');
 ?>
 
-<section class="container">
-  <h1>Connexion</h1>
-  <form method="POST" style="margin-top:16px; display:grid; gap:12px; max-width:420px;">
-    <?php foreach ($errors as $err): ?>
-      <div style="padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background: rgba(255,0,0,.08);">
-        <?= e($err) ?>
-      </div>
-    <?php endforeach; ?>
+<div class="login-box">
 
-    <label style="display:grid; gap:6px;">
-      <span style="color: var(--muted); font-size:12px;">Email</span>
-      <input type="email" name="email" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
-    </label>
+    <div class="login-logo">OE</div>
 
-    <label style="display:grid; gap:6px;">
-      <span style="color: var(--muted); font-size:12px;">Mot de passe</span>
-      <input type="password" name="password" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
-    </label>
+    <h1>Connexion</h1>
+    <p class="login-subtitle">Accédez à votre espace OmnesEvent</p>
 
-    <button class="btn btn-secondary" type="submit">Se connecter</button>
-  </form>
-</section>
+    <?php if (isset($_GET['erreur'])): ?>
+        <p class="msg msg-error">Email ou mot de passe incorrect.</p>
+    <?php endif; ?>
 
-<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+    <?php if (isset($_SESSION['tentatives']) && $_SESSION['tentatives'] > 0): ?>
+        <p class="msg msg-warning">Tentatives : <?php echo $_SESSION['tentatives']; ?></p>
+    <?php endif; ?>
 
+    <form method="post" action="/pages/login.php">
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" placeholder="votre@email.com" required />
+
+        <label for="mot_de_passe">Mot de passe</label>
+        <input type="password" name="mot_de_passe" id="mot_de_passe" placeholder="Votre mot de passe" required />
+
+        <button type="submit" class="btn">Se connecter</button>
+    </form>
+
+    <p class="form-footer">Pas encore de compte ? <a href="/pages/register.php">Créer un compte</a></p>
+</div>
+
+<?php include('../includes/footer.php'); ?>

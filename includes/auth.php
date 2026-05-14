@@ -1,6 +1,5 @@
 <?php
 // Inclure en haut de chaque page protégée, AVANT tout code HTML
-
 session_start();
 
 include('db.php');

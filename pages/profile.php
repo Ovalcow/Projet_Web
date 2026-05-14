@@ -1,24 +1,34 @@
-<?php declare(strict_types=1);
-require_once __DIR__ . '/../includes/db.php';
+<?php
+// auth.php gère la session + la redirection si pas connecté
 include('../includes/auth.php');
 
-$currentUser = null;
-$pageTitle = 'Mon profil';
+// Récupérer les infos complètes avec l'association (requête préparée + JOIN)
+$requete = $bdd->prepare(
+    'SELECT u.*, a.nom AS association_nom
+     FROM users u
+     LEFT JOIN associations a ON u.association_id = a.id
+     WHERE u.id = ?'
+);
+$requete->execute(array($currentUser['id']));
+$user = $requete->fetch();
+$requete->closeCursor();
 
-require_once __DIR__ . '/../includes/header.php';
+$pageTitle = 'Mon profil';
+include('../includes/header.php');
 ?>
 
-<section class="container">
-  <h1 style="margin-top:0;">Mon profil</h1>
-  <div style="margin-top:16px; padding:16px; background: rgba(255,255,255,.03); border:1px solid var(--border); border-radius:14px; max-width:720px;">
-    <p style="color: var(--muted); margin:0 0 12px;">
-      Connexion & modification du profil à implémenter en Phase A.
-    </p>
-    <p style="color: var(--muted); margin:0; font-size:13px;">
-      MVP requis ensuite : affichage/édition infos personnelles + changement de mot de passe.
-    </p>
-  </div>
-</section>
+<h1>Mon profil</h1>
 
-<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+<div class="profile-info">
+    <p><strong>Nom :</strong> <?php echo htmlspecialchars($user['nom']); ?></p>
+    <p><strong>Email :</strong> <?php echo htmlspecialchars($user['email']); ?></p>
+    <p><strong>Rôle :</strong> <?php echo htmlspecialchars($user['role']); ?></p>
 
+    <?php if ($user['association_nom']): ?>
+        <p><strong>Association :</strong> <?php echo htmlspecialchars($user['association_nom']); ?></p>
+    <?php endif; ?>
+
+    <p><strong>Membre depuis :</strong> <?php echo date('d/m/Y', strtotime($user['created_at'])); ?></p>
+</div>
+
+<?php include('../includes/footer.php'); ?>
