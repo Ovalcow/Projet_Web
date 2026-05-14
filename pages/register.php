@@ -1,5 +1,5 @@
-<?php declare(strict_types=1);
-require_once __DIR__ . '/../includes/db.php';
+<?php
+include('../includes/auth.php');
 
 // Phase A : inscription à implémenter.
 $currentUser = null;
