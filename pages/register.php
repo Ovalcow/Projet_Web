@@ -1,55 +1,107 @@
 <?php
-include('../includes/auth.php');
+session_start();
+include('../includes/db.php');
 
-// Phase A : inscription à implémenter.
 $currentUser = null;
-$pageTitle = 'Inscription';
-
-$errors = [];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $errors[] = "Inscription non implémentée (Phase A).";
+if (isset($_SESSION['user_id'])) {
+    $requete = $bdd->prepare('SELECT id, nom, email, role FROM users WHERE id = ?');
+    $requete->execute(array($_SESSION['user_id']));
+    $currentUser = $requete->fetch();
+    $requete->closeCursor();
 }
 
-require_once __DIR__ . '/../includes/header.php';
+if ($currentUser) {
+    header('Location: /pages/index.php');
+    exit();
+}
+
+// Traitement du formulaire (méthode POST - TP9)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    if (isset($_POST['nom'], $_POST['email'], $_POST['mot_de_passe'])) {
+
+        $nom   = htmlspecialchars($_POST['nom']);
+        $email = htmlspecialchars($_POST['email']);
+        $mdp   = $_POST['mot_de_passe'];
+
+        if ($nom === '' || $email === '' || $mdp === '') {
+            header('Location: /pages/register.php?erreur=vide');
+            exit();
+        }
+
+        // Vérifier si l'email existe déjà (requête préparée)
+        $requete = $bdd->prepare('SELECT id FROM users WHERE email = :email');
+        $requete->execute(array('email' => $email));
+        $existe = $requete->fetch();
+        $requete->closeCursor();
+
+        if ($existe) {
+            header('Location: /pages/register.php?erreur=existe');
+            exit();
+        }
+
+        // Insertion en base (requête préparée - cours slide 84)
+        $requete = $bdd->prepare(
+            'INSERT INTO users (nom, email, password_hash, role) VALUES (:nom, :email, :hash, :role)'
+        );
+        $requete->execute(array(
+            'nom'   => $nom,
+            'email' => $email,
+            'hash'  => password_hash($mdp, PASSWORD_DEFAULT),
+            'role'  => 'participant',
+        ));
+
+        header('Location: /pages/register.php?succes=1');
+        exit();
+
+    } else {
+        header('Location: /pages/register.php?erreur=vide');
+        exit();
+    }
+}
+
+$pageTitle = 'Inscription';
+include('../includes/header.php');
 ?>
 
-<section class="container">
-  <h1 style="margin-top:0;">Inscription</h1>
+<div class="login-box">
 
-  <form method="POST" style="margin-top:16px; display:grid; gap:12px; max-width:520px;">
-    <?php foreach ($errors as $err): ?>
-      <div style="padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background: rgba(255,0,0,.08);">
-        <?= e($err) ?>
-      </div>
-    <?php endforeach; ?>
+    <div class="login-logo">OE</div>
 
-    <label style="display:grid; gap:6px;">
-      <span style="color: var(--muted); font-size:12px;">Nom</span>
-      <input name="nom" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
-    </label>
+    <h1>Inscription</h1>
+    <p class="login-subtitle">Créez votre compte OmnesEvent</p>
 
-    <label style="display:grid; gap:6px;">
-      <span style="color: var(--muted); font-size:12px;">Email</span>
-      <input type="email" name="email" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
-    </label>
+    <?php if (isset($_GET['erreur'])): ?>
+        <?php
+        if ($_GET['erreur'] === 'vide') {
+            $msg = 'Tous les champs sont obligatoires.';
+        } elseif ($_GET['erreur'] === 'existe') {
+            $msg = 'Cet email est déjà utilisé.';
+        } else {
+            $msg = 'Erreur inconnue.';
+        }
+        ?>
+        <p class="msg msg-error"><?php echo $msg; ?></p>
+    <?php endif; ?>
 
-    <label style="display:grid; gap:6px;">
-      <span style="color: var(--muted); font-size:12px;">Mot de passe</span>
-      <input type="password" name="password" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
-    </label>
+    <?php if (isset($_GET['succes'])): ?>
+        <p class="msg msg-success">Compte créé ! Vous pouvez vous connecter.</p>
+    <?php endif; ?>
 
-    <label style="display:grid; gap:6px;">
-      <span style="color: var(--muted); font-size:12px;">Rôle</span>
-      <select name="role" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);">
-        <option value="participant">Participant</option>
-        <option value="organisateur">Organisateur</option>
-      </select>
-    </label>
+    <form method="post" action="/pages/register.php">
+        <label for="nom">Nom</label>
+        <input type="text" name="nom" id="nom" placeholder="Votre nom" required />
 
-    <button class="btn btn-secondary" type="submit">Créer le compte</button>
-  </form>
-</section>
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" placeholder="votre@email.com" required />
 
-<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+        <label for="mot_de_passe">Mot de passe</label>
+        <input type="password" name="mot_de_passe" id="mot_de_passe" placeholder="Choisissez un mot de passe" required />
 
+        <button type="submit" class="btn">Créer un compte</button>
+    </form>
+
+    <p class="form-footer">Déjà inscrit ? <a href="/pages/login.php">Se connecter</a></p>
+</div>
+
+<?php include('../includes/footer.php'); ?>
