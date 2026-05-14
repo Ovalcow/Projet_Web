@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 require_once __DIR__ . '/../includes/db.php';
+include('../includes/auth.php');
 
-// Phase A : auth/CRUD profil à implémenter.
 $currentUser = null;
 $pageTitle = 'Mon profil';
 
