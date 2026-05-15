@@ -9,10 +9,10 @@
   --card: #ffffff;
   --text: #1a2a3a;
   --muted: #5f7082;
-  --primary: #00838f;          /* teal ECE */
+  --primary: #00838f;
   --primary-dark: #005f6b;
   --primary-light: #b2dfdb;
-  --accent: #e85d4a;           /* corail pour les CTA */
+  --accent: #e85d4a;
   --border: #d5dce6;
   --radius: 10px;
   --shadow: 0 2px 8px rgba(0,0,0,.07);

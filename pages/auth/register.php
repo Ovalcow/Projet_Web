@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('../includes/db.php');
+include('../../includes/db.php');
 
 $currentUser = null;
 if (isset($_SESSION['user_id'])) {
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mdp   = $_POST['mot_de_passe'];
 
         if ($nom === '' || $email === '' || $mdp === '') {
-            header('Location: /pages/register.php?erreur=vide');
+            header('Location: /pages/auth/register.php?erreur=vide');
             exit();
         }
 
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $requete->closeCursor();
 
         if ($existe) {
-            header('Location: /pages/register.php?erreur=existe');
+            header('Location: /pages/auth/register.php?erreur=existe');
             exit();
         }
 
@@ -51,17 +51,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'role'  => 'participant',
         ));
 
-        header('Location: /pages/register.php?succes=1');
+        header('Location: /pages/auth/register.php?succes=1');
         exit();
 
     } else {
-        header('Location: /pages/register.php?erreur=vide');
+        header('Location: /pages/auth/register.php?erreur=vide');
         exit();
     }
 }
 
 $pageTitle = 'Inscription';
-include('../includes/header.php');
+include('../../includes/header.php');
 ?>
 
 <div class="login-box">
@@ -88,7 +88,7 @@ include('../includes/header.php');
         <p class="msg msg-success">Compte créé ! Vous pouvez vous connecter.</p>
     <?php endif; ?>
 
-    <form method="post" action="/pages/register.php">
+    <form method="post" action="/pages/auth/register.php">
         <label for="nom">Nom</label>
         <input type="text" name="nom" id="nom" placeholder="Votre nom" required />
 
@@ -101,7 +101,7 @@ include('../includes/header.php');
         <button type="submit" class="btn">Créer un compte</button>
     </form>
 
-    <p class="form-footer">Déjà inscrit ? <a href="/pages/login.php">Se connecter</a></p>
+    <p class="form-footer">Déjà inscrit ? <a href="/pages/auth/login.php">Se connecter</a></p>
 </div>
 
-<?php include('../includes/footer.php'); ?>
+<?php include('../../includes/footer.php'); ?>

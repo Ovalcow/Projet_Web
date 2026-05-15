@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('../includes/db.php');
+include('../../includes/db.php');
 
 // Vérifier si déjà connecté → redirection vers accueil
 $currentUser = null;
@@ -49,17 +49,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['tentatives'] = 0;
         }
 
-        header('Location: /pages/login.php?erreur=1');
+        header('Location: /pages/auth/login.php?erreur=1');
         exit();
 
     } else {
-        header('Location: /pages/login.php?erreur=1');
+        header('Location: /pages/auth/login.php?erreur=1');
         exit();
     }
 }
 
 $pageTitle = 'Connexion';
-include('../includes/header.php');
+include('../../includes/header.php');
 ?>
 
 <div class="login-box">
@@ -77,7 +77,7 @@ include('../includes/header.php');
         <p class="msg msg-warning">Tentatives : <?php echo $_SESSION['tentatives']; ?></p>
     <?php endif; ?>
 
-    <form method="post" action="/pages/login.php">
+    <form method="post" action="/pages/auth/login.php">
         <label for="email">Email</label>
         <input type="email" name="email" id="email" placeholder="votre@email.com" required />
 
@@ -87,7 +87,7 @@ include('../includes/header.php');
         <button type="submit" class="btn">Se connecter</button>
     </form>
 
-    <p class="form-footer">Pas encore de compte ? <a href="/pages/register.php">Créer un compte</a></p>
+    <p class="form-footer">Pas encore de compte ? <a href="/pages/auth/register.php">Créer un compte</a></p>
 </div>
 
-<?php include('../includes/footer.php'); ?>
+<?php include('../../includes/footer.php'); ?>

@@ -22,6 +22,6 @@ if (isset($_SESSION['user_id'])) {
 
 // Si aucun utilisateur valide n'est connecté, redirection vers la page de connexion
 if (!$currentUser) {
-    header('Location: login.php');
+    header('Location: ../pages/auth/login.php');
     exit();
 }

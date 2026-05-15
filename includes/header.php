@@ -12,14 +12,14 @@
             <a class="brand" href="/pages/index.php">OmnesEvent</a>
             <nav class="nav">
                 <a class="nav-link" href="/pages/events.php">Événements</a>
-                <a class="nav-link" href="/pages/profile.php">Mon profil</a>
+                <a class="nav-link" href="/pages/auth/profile.php">Mon profil</a>
 
                 <?php if (isset($currentUser) && $currentUser): ?>
                     <!-- TP10 : afficher un message discret pour identifier l'utilisateur -->
                     <span class="nav-link">Bonjour <?php echo htmlspecialchars($currentUser['nom']); ?></span>
-                    <a class="nav-link" href="/pages/logout.php">Déconnexion</a>
+                    <a class="nav-link" href="/pages/auth/logout.php">Déconnexion</a>
                 <?php else: ?>
-                    <a class="nav-link" href="/pages/login.php">Connexion</a>
+                    <a class="nav-link" href="/pages/auth/login.php">Connexion</a>
                 <?php endif; ?>
             </nav>
         </div>

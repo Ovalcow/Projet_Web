@@ -1,6 +1,6 @@
 <?php
 // auth.php gère la session + la redirection si pas connecté
-include('../includes/auth.php');
+include('../../includes/auth.php');
 
 // Récupérer les infos complètes avec l'association (requête préparée + JOIN)
 $requete = $bdd->prepare(
@@ -14,7 +14,7 @@ $user = $requete->fetch();
 $requete->closeCursor();
 
 $pageTitle = 'Mon profil';
-include('../includes/header.php');
+include('../../includes/header.php');
 ?>
 
 <h1>Mon profil</h1>
@@ -31,4 +31,4 @@ include('../includes/header.php');
     <p><strong>Membre depuis :</strong> <?php echo date('d/m/Y', strtotime($user['created_at'])); ?></p>
 </div>
 
-<?php include('../includes/footer.php'); ?>
+<?php include('../../includes/footer.php'); ?>
