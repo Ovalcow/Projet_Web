@@ -9,7 +9,22 @@
 
 require_once __DIR__ . '/db.php';
 
+// Durcissement session (avant session_start)
+$cookieParams = [
+  'lifetime' => 0,
+  'path' => '/',
+  'domain' => '',
+  'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+  'httponly' => true,
+  'samesite' => 'Strict',
+];
+
+if (PHP_VERSION_ID >= 70300) {
+  session_set_cookie_params($cookieParams);
+}
+
 @session_start();
+
 
 $currentUser = null;
 

@@ -12,10 +12,15 @@ if (!empty($flash['error'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $nom = trim((string)($_POST['nom'] ?? ''));
-  $email = strtolower(trim((string)($_POST['email'] ?? '')));
-  $password = (string)($_POST['password'] ?? '');
-  $role = (string)($_POST['role'] ?? '');
+  if (!csrf_verify()) {
+    $errors[] = 'Requête invalide (CSRF).';
+  } else {
+    $nom = trim((string)($_POST['nom'] ?? ''));
+    $email = strtolower(trim((string)($_POST['email'] ?? '')));
+
+    $password = (string)($_POST['password'] ?? '');
+    $role = (string)($_POST['role'] ?? '');
+
 
   if ($nom === '' || mb_strlen($nom) > 100) {
     $errors[] = 'Nom invalide.';
@@ -59,14 +64,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 }
+}
+
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
+
 
 <section class="container">
   <h1 style="margin-top:0;">Inscription</h1>
 
   <form method="POST" style="margin-top:16px; display:grid; gap:12px; max-width:520px;">
+    <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
+
     <?php foreach ($errors as $err): ?>
       <div style="padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background: rgba(255,0,0,.08);">
         <?= e($err) ?>

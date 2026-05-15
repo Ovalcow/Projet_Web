@@ -16,10 +16,14 @@ $message = $flash['success'] ?? null;
 $userId = (int)$currentUser['id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  // MVP: mise à jour nom/email + changement mot de passe
-  $nom = trim((string)($_POST['nom'] ?? ''));
-  $email = strtolower(trim((string)($_POST['email'] ?? '')));
-  $newPassword = (string)($_POST['new_password'] ?? '');
+  if (!csrf_verify()) {
+    $errors[] = 'Requête invalide (CSRF).';
+  } else {
+    // MVP: mise à jour nom/email + changement mot de passe
+    $nom = trim((string)($_POST['nom'] ?? ''));
+    $email = strtolower(trim((string)($_POST['email'] ?? '')));
+    $newPassword = (string)($_POST['new_password'] ?? '');
+
 
   if ($nom === '' || mb_strlen($nom) > 100) {
     $errors[] = 'Nom invalide.';
@@ -54,10 +58,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
     }
   }
+  }
 }
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
+
+
+
+
 
 <section class="container">
   <h1 style="margin-top:0;">Mon profil</h1>
@@ -77,7 +86,9 @@ require_once __DIR__ . '/../includes/header.php';
   <?php endif; ?>
 
   <div style="margin-top:16px; padding:16px; background: rgba(255,255,255,.03); border:1px solid var(--border); border-radius:14px; max-width:720px;">
-    <form method="POST" style="display:grid; gap:12px;">
+  <form method="POST" style="display:grid; gap:12px;">
+      <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
+
       <label style="display:grid; gap:6px;">
         <span style="color: var(--muted); font-size:12px;">Nom</span>
         <input name="nom" required value="<?= e((string)$currentUser['nom']) ?>" style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />

@@ -35,8 +35,14 @@ if (!$booking) {
 
 // QR payload : on encode l’URL de vérification.
 $payload = '/pages/billet_verify.php?reservation_id=' . (int)$booking['reservation_id'];
-$encoded = urlencode($payload);
-$qrUrl = 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' . $encoded;
+require_once __DIR__ . '/../includes/qr.php';
+$qrDataUri = qr_generate_png_data_uri($payload, 250);
+
+// Debug minimal : utile si la génération locale échoue.
+if (!empty($_GET['debug_qr']) && $_GET['debug_qr'] === '1') {
+  echo '<!-- DEBUG payload=' . e($payload) . ' qrDataUri=' . (empty($qrDataUri) ? 'EMPTY' : 'OK') . ' -->';
+}
+
 
 ?>
 <section class="container">
@@ -45,7 +51,13 @@ $qrUrl = 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' . $encoded
   <div style="margin-top:16px; padding:16px; background: rgba(255,255,255,.03); border:1px solid var(--border); border-radius:14px; max-width:820px;">
     <div style="display:grid; grid-template-columns: 280px 1fr; gap:16px; align-items:start;">
       <div style="background: rgba(0,0,0,.15); border:1px solid var(--border); border-radius:14px; padding:12px;">
-        <img src="<?= e($qrUrl) ?>" alt="QR code billet" style="width:100%; height:auto;" />
+        <?php if (!empty($qrDataUri)): ?>
+          <img src="<?= e($qrDataUri) ?>" alt="QR code billet" style="width:100%; height:auto;" />
+        <?php else: ?>
+          <div style="padding:12px;border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;">
+            QR indisponible côté serveur (génération locale introuvable).
+          </div>
+        <?php endif; ?>
       </div>
 
       <div>

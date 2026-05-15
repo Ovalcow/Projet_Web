@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/role_check.php';
 
 
 $pageTitle = 'Événements';
@@ -91,6 +92,12 @@ require_once __DIR__ . '/../includes/header.php';
 
     <button class="btn" type="submit">Rechercher</button>
   </form>
+
+  <?php if (!empty($currentUser) && user_is_organisateur()): ?>
+    <div style="margin: 8px 0 16px;">
+      <a class="btn btn-secondary" href="/pages/event_create.php">Créer un événement</a>
+    </div>
+  <?php endif; ?>
 
   <div class="events-grid">
     <?php if (!$events): ?>

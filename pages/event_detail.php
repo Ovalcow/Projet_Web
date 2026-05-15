@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../includes/functions.php';
+
 
 // Détail événement.
 $pageTitle = 'Détail événement';
@@ -75,7 +77,11 @@ $placesRestantes = max(0, $max - $nb);
             <?php if ($hasReservation): ?>
               <a class="btn btn-secondary" href="/pages/billet_qr.php?event_id=<?= (int)$event['id'] ?>" style="margin-right:10px;">Voir QR billet</a>
             <?php else: ?>
-              <button class="btn" type="button" disabled title="Inscription gérée en Phase C">Inscription bientôt</button>
+              <form method="POST" action="/pages/event_join.php" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
+                <input type="hidden" name="event_id" value="<?= (int)$event['id'] ?>" />
+                <button class="btn" type="submit" <?= ($placesRestantes <= 0 ? 'disabled title="Plus de places disponibles"' : '') ?>>S’inscrire</button>
+              </form>
             <?php endif; ?>
           <?php else: ?>
             <button class="btn" type="button" disabled title="Connecte-toi pour générer le QR">Connecte-toi</button>
