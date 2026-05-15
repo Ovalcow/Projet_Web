@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['email'], $_POST['mot_de_passe'])) {
 
-        $email = htmlspecialchars($_POST['email']);
+        $email = $_POST['email'];
         $mdp   = $_POST['mot_de_passe'];
 
         // Requête préparée (cours slide 84)

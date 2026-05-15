@@ -20,8 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['nom'], $_POST['email'], $_POST['mot_de_passe'])) {
 
-        $nom   = htmlspecialchars($_POST['nom']);
-        $email = htmlspecialchars($_POST['email']);
+        $nom   = $_POST['nom'];
+        $email = $_POST['email'];
         $mdp   = $_POST['mot_de_passe'];
 
         if ($nom === '' || $email === '' || $mdp === '') {
