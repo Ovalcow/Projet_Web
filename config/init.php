@@ -1,9 +1,12 @@
 <?php
-// Inclure en haut de chaque page protégée, AVANT tout code HTML
+// Fichier d'initialisation : à inclure en haut de CHAQUE page, AVANT tout HTML
+// session_start() + connexion BDD + chargement de l'utilisateur connecté
+
 session_start();
 
-include('db.php');
+include(__DIR__ . '/db.php');
 
+// Charger l'utilisateur connecté (s'il y en a un)
 $currentUser = null;
 
 if (isset($_SESSION['user_id'])) {
@@ -18,10 +21,4 @@ if (isset($_SESSION['user_id'])) {
         session_destroy();
         session_start();
     }
-}
-
-// Si aucun utilisateur valide n'est connecté, redirection vers la page de connexion
-if (!$currentUser) {
-    header('Location: ../pages/auth/login.php');
-    exit();
 }

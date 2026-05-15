@@ -1,5 +1,6 @@
 <?php
-include('../includes/auth.php');
+include('config/init.php');
+include('includes/auth_check.php');
 
 $pageTitle = 'Accueil';
 
@@ -15,7 +16,6 @@ $reponse = $bdd->query(
 $events = $reponse->fetchAll();
 $reponse->closeCursor();
 
-// Charger les catégories et associations pour les filtres
 $repCategories = $bdd->query('SELECT id, nom FROM categories ORDER BY nom');
 $categories = $repCategories->fetchAll();
 $repCategories->closeCursor();
@@ -24,7 +24,7 @@ $repAssociations = $bdd->query('SELECT id, nom FROM associations ORDER BY nom');
 $associations = $repAssociations->fetchAll();
 $repAssociations->closeCursor();
 
-include('../includes/header.php');
+include('includes/header.php');
 ?>
 
 <section class="hero">
@@ -35,9 +35,7 @@ include('../includes/header.php');
 </section>
 
 <section class="container">
-
-    <!-- Formulaire GET (TP8) pour la recherche -->
-    <form class="search-form" action="/pages/events.php" method="GET">
+    <form class="search-form" action="/pages/events/liste.php" method="GET">
         <label>
             <span>Recherche</span>
             <input type="text" name="q" placeholder="Titre, lieu…" />
@@ -64,7 +62,6 @@ include('../includes/header.php');
                 <?php endforeach; ?>
             </select>
         </label>
-
         <button class="btn" type="submit">Rechercher</button>
     </form>
 
@@ -82,7 +79,7 @@ include('../includes/header.php');
             <article class="event-card">
                 <?php if (!empty($ev['affiche_path'])): ?>
                     <img class="event-affiche"
-                         src="<?php echo htmlspecialchars('/uploads/' . $ev['affiche_path']); ?>"
+                         src="/uploads/events/<?php echo htmlspecialchars($ev['affiche_path']); ?>"
                          alt="Affiche de <?php echo htmlspecialchars($ev['titre']); ?>" />
                 <?php else: ?>
                     <img class="event-affiche" src="/assets/img/default_event.jpg" alt="Affiche par défaut" />
@@ -94,11 +91,10 @@ include('../includes/header.php');
                     <p class="event-lieu"><?php echo htmlspecialchars($ev['lieu']); ?></p>
                     <p class="event-capacity">Places restantes : <strong><?php echo $placesRestantes; ?></strong></p>
                 </div>
-
-                <a class="btn btn-secondary" href="/pages/event_detail.php?id=<?php echo (int)$ev['id']; ?>">Voir</a>
+                <a class="btn btn-secondary" href="/pages/events/detail.php?id=<?php echo (int)$ev['id']; ?>">Voir</a>
             </article>
         <?php endforeach; ?>
     </div>
 </section>
 
-<?php include('../includes/footer.php'); ?>
+<?php include('includes/footer.php'); ?>

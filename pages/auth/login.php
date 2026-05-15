@@ -1,22 +1,15 @@
 <?php
-session_start();
-include('../../includes/db.php');
+// Page publique : on n'inclut PAS auth_check (sinon boucle infinie)
+include('../../config/init.php');
+include('../../includes/functions.php');
 
-// Vérifier si déjà connecté → redirection vers accueil
-$currentUser = null;
-if (isset($_SESSION['user_id'])) {
-    $requete = $bdd->prepare('SELECT id, nom, email, role FROM users WHERE id = ?');
-    $requete->execute(array($_SESSION['user_id']));
-    $currentUser = $requete->fetch();
-    $requete->closeCursor();
-}
-
+// Déjà connecté → accueil
 if ($currentUser) {
-    header('Location: /pages/index.php');
+    header('Location: /index.php');
     exit();
 }
 
-// Traitement du formulaire (méthode POST - TP9)
+// Traitement POST (TP9)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['email'], $_POST['mot_de_passe'])) {
@@ -24,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_POST['email'];
         $mdp   = $_POST['mot_de_passe'];
 
-        // Requête préparée (cours slide 84)
         $requete = $bdd->prepare('SELECT id, nom, email, password_hash, role FROM users WHERE email = :email');
         $requete->execute(array('email' => $email));
         $user = $requete->fetch();
@@ -33,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user && password_verify($mdp, $user['password_hash'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['tentatives'] = 0;
-            header('Location: /pages/index.php');
+            header('Location: /index.php');
             exit();
         }
 
@@ -63,9 +55,7 @@ include('../../includes/header.php');
 ?>
 
 <div class="login-box">
-
     <div class="login-logo">OE</div>
-
     <h1>Connexion</h1>
     <p class="login-subtitle">Accédez à votre espace OmnesEvent</p>
 
@@ -76,6 +66,8 @@ include('../../includes/header.php');
     <?php if (isset($_SESSION['tentatives']) && $_SESSION['tentatives'] > 0): ?>
         <p class="msg msg-warning">Tentatives : <?php echo $_SESSION['tentatives']; ?></p>
     <?php endif; ?>
+
+    <?php afficher_flash(); ?>
 
     <form method="post" action="/pages/auth/login.php">
         <label for="email">Email</label>

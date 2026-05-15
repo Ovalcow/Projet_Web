@@ -1,21 +1,13 @@
 <?php
-session_start();
-include('../../includes/db.php');
-
-$currentUser = null;
-if (isset($_SESSION['user_id'])) {
-    $requete = $bdd->prepare('SELECT id, nom, email, role FROM users WHERE id = ?');
-    $requete->execute(array($_SESSION['user_id']));
-    $currentUser = $requete->fetch();
-    $requete->closeCursor();
-}
+// Page publique : pas de auth_check
+include('../../config/init.php');
+include('../../includes/functions.php');
 
 if ($currentUser) {
-    header('Location: /pages/index.php');
+    header('Location: /index.php');
     exit();
 }
 
-// Traitement du formulaire (méthode POST - TP9)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['nom'], $_POST['email'], $_POST['mot_de_passe'])) {
@@ -29,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Vérifier si l'email existe déjà (requête préparée)
         $requete = $bdd->prepare('SELECT id FROM users WHERE email = :email');
         $requete->execute(array('email' => $email));
         $existe = $requete->fetch();
@@ -40,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Insertion en base (requête préparée - cours slide 84)
         $requete = $bdd->prepare(
             'INSERT INTO users (nom, email, password_hash, role) VALUES (:nom, :email, :hash, :role)'
         );
@@ -65,9 +55,7 @@ include('../../includes/header.php');
 ?>
 
 <div class="login-box">
-
     <div class="login-logo">OE</div>
-
     <h1>Inscription</h1>
     <p class="login-subtitle">Créez votre compte OmnesEvent</p>
 

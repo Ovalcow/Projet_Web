@@ -1,8 +1,7 @@
 <?php
-// auth.php gère la session + la redirection si pas connecté
-include('../../includes/auth.php');
+include('../../config/init.php');
+include('../../includes/auth_check.php');
 
-// Récupérer les infos complètes avec l'association (requête préparée + JOIN)
 $requete = $bdd->prepare(
     'SELECT u.*, a.nom AS association_nom
      FROM users u
