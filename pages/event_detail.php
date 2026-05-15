@@ -65,8 +65,22 @@ $placesRestantes = max(0, $max - $nb);
 
           <a class="btn btn-secondary" href="/pages/events.php" style="margin-right:10px;">Retour</a>
 
-          <!-- Placeholder MVP inscription (Phase A/C) -->
-          <button class="btn" type="button" disabled title="Inscription gérée en Phase C">Inscription bientôt</button>
+          <!-- QR code billet (si réservation existante) -->
+          <?php if (!empty($currentUser)): ?>
+            <?php $hasReservation = db_single(
+              "SELECT id FROM reservations WHERE event_id = :event_id AND participant_id = :participant_id",
+              [':event_id' => (int)$event['id'], ':participant_id' => (int)$currentUser['id']]
+            ); ?>
+
+            <?php if ($hasReservation): ?>
+              <a class="btn btn-secondary" href="/pages/billet_qr.php?event_id=<?= (int)$event['id'] ?>" style="margin-right:10px;">Voir QR billet</a>
+            <?php else: ?>
+              <button class="btn" type="button" disabled title="Inscription gérée en Phase C">Inscription bientôt</button>
+            <?php endif; ?>
+          <?php else: ?>
+            <button class="btn" type="button" disabled title="Connecte-toi pour générer le QR">Connecte-toi</button>
+          <?php endif; ?>
+
         </div>
       </div>
 
