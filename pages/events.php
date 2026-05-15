@@ -20,8 +20,11 @@ $sql = "SELECT e.id, e.titre, e.description, e.date_event, e.lieu, e.jauge_max,
 $params = [];
 
 if ($q !== '') {
-  $sql .= " AND (e.titre LIKE :q OR e.lieu LIKE :q OR e.description LIKE :q) ";
-  $params[':q'] = '%' . $q . '%';
+  $sql .= " AND (e.titre LIKE :q_titre OR e.lieu LIKE :q_lieu OR e.description LIKE :q_description) ";
+  
+  $params[':q_titre'] = '%' . $q . '%';
+  $params[':q_lieu'] = '%' . $q . '%';
+  $params[':q_description'] = '%' . $q . '%';
 }
 if ($date !== '') {
   $sql .= " AND e.date_event >= :d0 AND e.date_event < :d1 ";
