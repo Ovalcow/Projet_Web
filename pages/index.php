@@ -30,7 +30,7 @@ require_once __DIR__ . '/../includes/header.php';
       <?php if (!empty($ev['affiche_path'])): ?>
         <img class="event-affiche" src="<?= e('/uploads/' . $ev['affiche_path']) ?>" alt="Affiche de <?= e($ev['titre']) ?>"/>
       <?php else: ?>
-        <img class="event-affiche" src="<?= e('/assets/images/default_event.png') ?>" alt="Affiche par défaut" />
+        <img class="event-affiche" src="<?= e('/assets/images/logo_omneseducation.webp') ?>" alt="Affiche par défaut" />
         <!--si pas d'image on en affiche une par défaut-->
       <?php endif; ?>
       

@@ -1,9 +1,15 @@
 :root {
-  --bg: #0b1220;
+  --text: #9f9eb7;
+  --header:#190038;
+  --logo:#7772b4;
+  --souslogo:#6d67ae;
+  --bg: #fefefe;
+  --highlight: #5d0282;
+  
+  
   --card: rgb(23, 8, 51);
-  --text: #e7ecff;
   --muted: #a9b4d0;
-  --primary: #6d5efc;
+  --primary: #9966CC;
   --primary2: #38bdf8;
   --border: rgba(255, 255, 255, .10);
   --radius: 14px;
@@ -15,9 +21,9 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family:"Arial Black", Arial, sans-serif;
   background: var(--bg);
-  color: var(--text);
+  color: var(--highlight);
 }
 
 .container {
@@ -31,10 +37,9 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--card);
-  /* même couleur que le logo pour un effet de continuité */
+  background: var(--header);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--bg);
 }
 
 .header-inner {
@@ -44,12 +49,21 @@ body {
   padding: 12px 0;
 }
 
-.brand {
+.logo {
   color: var(--text);
+  font-family:  Impact ,"Arial Black", Arial, sans-serif;
+  font-size: 18px;
   text-decoration: none;
   font-weight: 800;
-  letter-spacing: .3px;
+  letter-spacing: .5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
+.logo:hover{
+  color: var(--highlight);
+}
+
 
 .nav {
   display: flex;
@@ -59,13 +73,13 @@ body {
 }
 
 .nav-link {
-  color: var(--muted);
+  color: var(--text);
   text-decoration: none;
   font-size: 14px;
 }
 
 .nav-link:hover {
-  color: var(--text);
+  color: var(--highlight);
 }
 
 .site-main {
@@ -83,7 +97,7 @@ body {
 
 .hero p {
   margin: 0;
-  color: var(--muted);
+  color: var(--text);
 }
 
 .search-form {
@@ -91,8 +105,8 @@ body {
   gap: 12px;
   margin-top: 18px;
   padding: 16px;
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: var(--header);
+  border: 1px solid var(--bg);
   border-radius: var(--radius);
 }
 
@@ -102,7 +116,7 @@ body {
 }
 
 .search-form span {
-  color: var(--muted);
+  color: var(--text);
   font-size: 12px;
 }
 
@@ -111,7 +125,7 @@ body {
   width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--text);
   background: rgba(255, 255, 255, .03);
   color: var(--text);
 }
@@ -123,8 +137,8 @@ body {
   gap: 8px;
   border-radius: 12px;
   padding: 11px 14px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, .03);
+  border: 1px solid var(--bg);
+  background: var(--highlight);
   color: var(--text);
   text-decoration: none;
   font-weight: 700;
@@ -135,9 +149,12 @@ body {
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, rgba(109, 94, 252, .35), rgba(56, 189, 248, .25));
-  border-color: rgba(109, 94, 252, .45);
+  background: var(--highlight);
+  border-color: var(--highlight);
 }
+
+/*fin *events.php*/
+
 
 .events-grid {
   margin-top: 16px;
@@ -146,7 +163,8 @@ body {
 }
 
 .event-card {
-  background: var(--card);
+  color: var(--text);
+  background: var(--header);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
@@ -195,7 +213,7 @@ body {
 
 .site-footer {
   border-top: 1px solid var(--border);
-  background: var(--card);
+  background: var(--header);
   padding: 18px 0;
   color: var(--muted);
   text-align: center;
