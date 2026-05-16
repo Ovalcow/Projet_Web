@@ -23,9 +23,11 @@ function flash_set(string $type, string $message): void {
 // - csrf_token(): génère/retourne le token en session
 // - csrf_verify(): valide le token reçu dans $_POST['csrf_token']
 function csrf_token(): string {
+  // La session doit idéalement être démarrée via includes/init.php
   if (session_status() !== PHP_SESSION_ACTIVE) {
-    @session_start();
+    throw new RuntimeException('Session inactive: csrf_token() nécessite init.php');
   }
+
   if (empty($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
   }
@@ -33,8 +35,9 @@ function csrf_token(): string {
 }
 
 function csrf_verify(): bool {
+  // La session doit idéalement être démarrée via includes/init.php
   if (session_status() !== PHP_SESSION_ACTIVE) {
-    @session_start();
+    throw new RuntimeException('Session inactive: csrf_verify() nécessite init.php');
   }
 
   $token = $_POST['csrf_token'] ?? '';
@@ -49,6 +52,7 @@ function csrf_verify(): bool {
 
   return hash_equals($sessionToken, $token);
 }
+
 
 
 

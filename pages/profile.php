@@ -24,42 +24,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = strtolower(trim((string)($_POST['email'] ?? '')));
     $newPassword = (string)($_POST['new_password'] ?? '');
 
+    if ($nom === '' || mb_strlen($nom) > 100) {
+      $errors[] = 'Nom invalide.';
+    }
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      $errors[] = 'Email invalide.';
+    }
 
-  if ($nom === '' || mb_strlen($nom) > 100) {
-    $errors[] = 'Nom invalide.';
-  }
-  if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errors[] = 'Email invalide.';
-  }
+    if (!$errors) {
+      // update email uniqueness if changed
+      $existing = db_single(
+        'SELECT id FROM users WHERE email = :email AND id != :id',
+        [':email' => $email, ':id' => $userId]
+      );
 
-  if (!$errors) {
-    // update email uniqueness if changed
-    $existing = db_single('SELECT id FROM users WHERE email = :email AND id != :id', [':email' => $email, ':id' => $userId]);
-    if ($existing) {
-      $errors[] = 'Un autre compte utilise déjà cet email.';
-    } else {
-      $params = [':nom' => $nom, ':email' => $email, ':id' => $userId];
-      $sql = 'UPDATE users SET nom = :nom, email = :email';
-      if ($newPassword !== '') {
-        if (mb_strlen($newPassword) < 8) {
-          $errors[] = 'Mot de passe trop court (min 8 caractères).';
-        } else {
-          $hash = password_hash($newPassword, PASSWORD_BCRYPT);
-          $sql .= ', password_hash = :pw';
-          $params[':pw'] = $hash;
+      if ($existing) {
+        $errors[] = 'Un autre compte utilise déjà cet email.';
+      } else {
+        $params = [':nom' => $nom, ':email' => $email, ':id' => $userId];
+        $sql = 'UPDATE users SET nom = :nom, email = :email';
+
+        if ($newPassword !== '') {
+          if (mb_strlen($newPassword) < 8) {
+            $errors[] = 'Mot de passe trop court (min 8 caractères).';
+          } else {
+            $hash = password_hash($newPassword, PASSWORD_BCRYPT);
+            $sql .= ', password_hash = :pw';
+            $params[':pw'] = $hash;
+          }
         }
-      }
-      if (!$errors) {
-        $sql .= ' WHERE id = :id';
-        db_execute($sql, $params);
-        flash_set('success', 'Profil mis à jour avec succès.');
-        header('Location: /pages/profile.php');
-        exit;
+
+        if (!$errors) {
+          $sql .= ' WHERE id = :id';
+          db_execute($sql, $params);
+          flash_set('success', 'Profil mis à jour avec succès.');
+          header('Location: /pages/profile.php');
+          exit;
+        }
       }
     }
   }
-  }
 }
+
 
 require_once __DIR__ . '/../includes/header.php';
 ?>

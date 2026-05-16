@@ -62,20 +62,60 @@ if ($errors) {
   redirect('/pages/event_detail.php?id=' . (int)$eventId);
 }
 
+// Transaction pour limiter le risque de sur-occupation (race condition)
+$reservationId = 0;
 try {
+  global $pdo;
+  if (!isset($pdo) || !$pdo instanceof PDO) {
+    throw new RuntimeException('PDO non disponible');
+  }
+
+  $pdo->beginTransaction();
+
+  // Verrouille l’événement pendant la transaction
+  $evRow = db_single(
+    'SELECT id FROM events WHERE id = :id FOR UPDATE',
+    [':id' => $eventId]
+  );
+
+  if (!$evRow) {
+    throw new RuntimeException('Événement introuvable');
+  }
+
+  // Re-vérifie la capacité au moment de l’insertion
+  $capRow = db_single(
+    "SELECT (SELECT COUNT(*) FROM reservations r WHERE r.event_id = e.id) AS nb_reservations,
+            e.jauge_max AS jauge_max
+     FROM events e WHERE e.id = :id",
+    [':id' => $eventId]
+  );
+
+  $nb2 = isset($capRow['nb_reservations']) ? (int)$capRow['nb_reservations'] : 0;
+  $max2 = isset($capRow['jauge_max']) ? (int)$capRow['jauge_max'] : 0;
+
+  if ($max2 > 0 && $nb2 >= $max2) {
+    throw new RuntimeException('Plus de places disponibles');
+  }
+
   db_execute(
     "INSERT INTO reservations (event_id, participant_id, presence_status)
      VALUES (:event_id, :participant_id, 'pending')",
     [':event_id' => $eventId, ':participant_id' => (int)$currentUser['id']]
   );
+
+  $newResRow = db_single('SELECT LAST_INSERT_ID() AS id');
+  $reservationId = $newResRow ? (int)$newResRow['id'] : 0;
+
+  $pdo->commit();
 } catch (Throwable $e) {
+  if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+    $pdo->rollBack();
+  }
+
   $_SESSION['flash'] = $_SESSION['flash'] ?? [];
-  $_SESSION['flash']['error'] = 'Inscription impossible (déjà inscrit ou contrainte).';
+  $_SESSION['flash']['error'] = 'Inscription impossible (conflit, déjà inscrit, plus de places, ou contrainte).';
   redirect('/pages/event_detail.php?id=' . (int)$eventId);
 }
-
-$newResRow = db_single('SELECT LAST_INSERT_ID() AS id');
-$reservationId = $newResRow ? (int)$newResRow['id'] : 0;
 
 if ($reservationId <= 0) {
   $_SESSION['flash'] = $_SESSION['flash'] ?? [];
