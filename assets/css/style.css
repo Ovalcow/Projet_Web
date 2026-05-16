@@ -54,7 +54,13 @@ body{
 .event-capacity{ margin:0; font-size: 13px; color: var(--muted); }
 .event-meta .btn{ margin-top: 8px; width: fit-content; }
 
-.site-footer{ border-top: 1px solid var(--border); padding: 18px 0; color: var(--muted); }
+site-footer{ 
+  border-top: 1px solid var(--border);
+  background: var(--card);
+  padding: 18px 0;
+  color: var(--muted);
+}
+
 
 @media(min-width: 760px){
   .events-grid{ grid-template-columns: 1fr 1fr; }
