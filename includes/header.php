@@ -4,10 +4,10 @@ require_once __DIR__ . '/role_check.php';
 <!doctype html>
 <html lang="fr">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?php if (isset($pageTitle)) { echo htmlspecialchars($pageTitle); } else { echo 'OmnesEvent'; } ?></title>
-    <link rel="stylesheet" href="/assets/css/style.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><?= isset($pageTitle) ? e($pageTitle) : 'OmnesEvent' ?></title>
+  <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
 <body>
   <header class="site-header">
@@ -28,5 +28,6 @@ require_once __DIR__ . '/role_check.php';
     </div>
   </header>
 
-    <main class="site-main">
-        <div class="container">
+  <main class="site-main">
+    <div class="container">
+

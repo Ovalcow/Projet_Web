@@ -93,42 +93,22 @@ require_once __DIR__ . '/../includes/header.php';
       <input type="email" name="email" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
     </label>
 
-    <div class="login-logo">OE</div>
+    <label style="display:grid; gap:6px;">
+      <span style="color: var(--muted); font-size:12px;">Mot de passe</span>
+      <input type="password" name="password" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
+    </label>
 
-    <h1>Inscription</h1>
-    <p class="login-subtitle">Créez votre compte OmnesEvent</p>
+    <label style="display:grid; gap:6px;">
+      <span style="color: var(--muted); font-size:12px;">Rôle</span>
+      <select name="role" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);">
+        <option value="participant">Participant</option>
+        <option value="organisateur">Organisateur</option>
+      </select>
+    </label>
 
-    <?php if (isset($_GET['erreur'])): ?>
-        <?php
-        if ($_GET['erreur'] === 'vide') {
-            $msg = 'Tous les champs sont obligatoires.';
-        } elseif ($_GET['erreur'] === 'existe') {
-            $msg = 'Cet email est déjà utilisé.';
-        } else {
-            $msg = 'Erreur inconnue.';
-        }
-        ?>
-        <p class="msg msg-error"><?php echo $msg; ?></p>
-    <?php endif; ?>
+    <button class="btn btn-secondary" type="submit">Créer le compte</button>
+  </form>
+</section>
 
-    <?php if (isset($_GET['succes'])): ?>
-        <p class="msg msg-success">Compte créé ! Vous pouvez vous connecter.</p>
-    <?php endif; ?>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
 
-    <form method="post" action="/pages/register.php">
-        <label for="nom">Nom</label>
-        <input type="text" name="nom" id="nom" placeholder="Votre nom" required />
-
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email" placeholder="votre@email.com" required />
-
-        <label for="mot_de_passe">Mot de passe</label>
-        <input type="password" name="mot_de_passe" id="mot_de_passe" placeholder="Choisissez un mot de passe" required />
-
-        <button type="submit" class="btn">Créer un compte</button>
-    </form>
-
-    <p class="form-footer">Déjà inscrit ? <a href="/pages/login.php">Se connecter</a></p>
-</div>
-
-<?php include('../includes/footer.php'); ?>

@@ -68,11 +68,11 @@ require_once __DIR__ . '/../includes/header.php';
 
   <h1>Connexion</h1>
   <form method="POST" style="margin-top:16px; display:grid; gap:12px; max-width:420px;">
-<input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>" />
+    <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
 
     <?php foreach ($errors as $err): ?>
       <div style="padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background: rgba(255,0,0,.08);">
-<?= htmlspecialchars((string)$err, ENT_QUOTES, 'UTF-8') ?>
+        <?= e($err) ?>
       </div>
     <?php endforeach; ?>
 
@@ -95,7 +95,5 @@ require_once __DIR__ . '/../includes/header.php';
   </form>
 </section>
 
-    <p class="form-footer">Pas encore de compte ? <a href="/pages/register.php">Créer un compte</a></p>
-</div>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
 
-<?php include('../includes/footer.php'); ?>

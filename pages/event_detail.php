@@ -6,20 +6,14 @@ require_once __DIR__ . '/../includes/functions.php';
 // Détail événement.
 $pageTitle = 'Détail événement';
 
-if (!isset($_GET['id'])) {
-    include('../includes/header.php');
-    echo '<section class="container"><p>ID événement manquant.</p></section>';
-    include('../includes/footer.php');
-    exit;
-}
-
-$id = (int)$_GET['id'];
-
+$id = (int)($_GET['id'] ?? 0);
 if ($id <= 0) {
-    include('../includes/header.php');
-    echo '<section class="container"><p>ID événement invalide.</p></section>';
-    include('../includes/footer.php');
-    exit;
+  http_response_code(400);
+  $message = 'ID événement invalide.';
+  require_once __DIR__ . '/../includes/header.php';
+  echo '<section class="container"><p>' . e($message) . '</p></section>';
+  require_once __DIR__ . '/../includes/footer.php';
+  exit;
 }
 
 $params = [':id' => $id];
@@ -63,18 +57,18 @@ if (!empty($currentUser)) {
 
 
 
-include('../includes/header.php');
+require_once __DIR__ . '/../includes/header.php';
 
 if (!$event) {
-    echo '<section class="container"><p>Événement introuvable.</p></section>';
-    include('../includes/footer.php');
-    exit;
+  echo '<section class="container"><p>Événement introuvable.</p></section>';
+  require_once __DIR__ . '/../includes/footer.php';
+  exit;
 }
 
-$nb  = (int)$event['nb_reservations'];
+$nb = (int)$event['nb_reservations'];
 $max = (int)$event['jauge_max'];
-$placesRestantes = $max - $nb;
-if ($placesRestantes < 0) { $placesRestantes = 0; }
+$placesRestantes = max(0, $max - $nb);
+
 ?>
 
 <section class="container">
@@ -214,11 +208,13 @@ if ($placesRestantes < 0) { $placesRestantes = 0; }
         </div>
       </div>
 
-        <div style="margin-top:14px;">
-            <h2>Description</h2>
-            <p><?php echo nl2br(htmlspecialchars($event['description'])); ?></p>
-        </div>
+      <div style="margin-top:14px;">
+        <h2 style="font-size:16px; margin:0 0 8px;">Description</h2>
+        <p style="margin:0; white-space:pre-wrap; color: var(--text);"><?= nl2br(e($event['description'])) ?></p>
+      </div>
     </div>
+  </div>
 </section>
 
-<?php include('../includes/footer.php'); ?>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+

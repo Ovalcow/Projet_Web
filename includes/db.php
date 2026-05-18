@@ -1,54 +1,52 @@
 <?php
 declare(strict_types=1);
 
-// Connexion à MySQL avec PDO
+// Connexion PDO + helpers.
+
+$DB_HOST = getenv('DB_HOST') ?: 'localhost';
+$DB_NAME = getenv('DB_NAME') ?: 'omnes_event';
+$DB_USER = getenv('DB_USER') ?: 'root';
+$DB_PASS = getenv('DB_PASS') ?: '';
+$DB_CHARSET = 'utf8mb4';
+
+$dsn = "mysql:host={$DB_HOST};dbname={$DB_NAME};charset={$DB_CHARSET}";
 
 try {
-    $bdd = new PDO(
-        'mysql:host=localhost;dbname=omnes_event;charset=utf8',
-        'root',
-        '',
-        array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
-    );
-} catch (Exception $e) {
-    die('Erreur : ' . $e->getMessage());
+  $pdo = new PDO($dsn, $DB_USER, $DB_PASS, [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES => false,
+  ]);
+} catch (Throwable $e) {
+  // En prod: logger + page d’erreur générique.
+  http_response_code(500);
+  echo 'Erreur de connexion DB.';
+  exit;
 }
 
-/**
- * Retourne une seule ligne (ou null) depuis la BDD.
- * Utilise des requêtes préparées avec :param.
- */
-function db_single(string $sql, array $params = []): ?array {
-    global $bdd;
-    $stmt = $bdd->prepare($sql);
-    $stmt->execute($params);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    $stmt->closeCursor();
-    return $row !== false ? $row : null;
+function db_query(string $sql, array $params = []): array {
+  global $pdo;
+  $stmt = $pdo->prepare($sql);
+  $stmt->execute($params);
+  return $stmt->fetchAll();
 }
 
-/**
- * Retourne toutes les lignes depuis la BDD.
- */
-function db_all(string $sql, array $params = []): array {
-    global $bdd;
-    $stmt = $bdd->prepare($sql);
-    $stmt->execute($params);
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stmt->closeCursor();
-    return is_array($rows) ? $rows : [];
-}
-
-/**
- * Exécute une requête d'écriture (INSERT/UPDATE/DELETE).
- * Retourne le nombre de lignes affectées.
- */
 function db_execute(string $sql, array $params = []): int {
-    global $bdd;
-    $stmt = $bdd->prepare($sql);
-    $stmt->execute($params);
-    $affected = $stmt->rowCount();
-    $stmt->closeCursor();
-    return (int)$affected;
+  global $pdo;
+  $stmt = $pdo->prepare($sql);
+  $stmt->execute($params);
+  return $stmt->rowCount();
+}
+
+function db_single(string $sql, array $params = []): ?array {
+  global $pdo;
+  $stmt = $pdo->prepare($sql);
+  $stmt->execute($params);
+  $row = $stmt->fetch();
+  return $row ?: null;
+}
+
+function e(string $s): string {
+  return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
