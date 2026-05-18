@@ -68,6 +68,7 @@ require_once __DIR__ . '/../includes/header.php';
 
   <h1>Connexion</h1>
   <form  class="login-form" method="POST" style="margin-top:16px; display:grid; gap:12px; max-width:420px;">
+    <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
     <?php foreach ($errors as $err): ?>
       <div style="padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background: rgba(255,0,0,.08);">
         <?= e($err) ?>
