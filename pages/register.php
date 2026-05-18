@@ -1,70 +1,97 @@
-<?php
-session_start();
-include('../includes/db.php');
-
-$currentUser = null;
-if (isset($_SESSION['user_id'])) {
-    $requete = $bdd->prepare('SELECT id, nom, email, role FROM users WHERE id = ?');
-    $requete->execute(array($_SESSION['user_id']));
-    $currentUser = $requete->fetch();
-    $requete->closeCursor();
-}
-
-if ($currentUser) {
-    header('Location: /pages/index.php');
-    exit();
-}
-
-// Traitement du formulaire (méthode POST - TP9)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    if (isset($_POST['nom'], $_POST['email'], $_POST['mot_de_passe'])) {
-
-        $nom   = htmlspecialchars($_POST['nom']);
-        $email = htmlspecialchars($_POST['email']);
-        $mdp   = $_POST['mot_de_passe'];
-
-        if ($nom === '' || $email === '' || $mdp === '') {
-            header('Location: /pages/register.php?erreur=vide');
-            exit();
-        }
-
-        // Vérifier si l'email existe déjà (requête préparée)
-        $requete = $bdd->prepare('SELECT id FROM users WHERE email = :email');
-        $requete->execute(array('email' => $email));
-        $existe = $requete->fetch();
-        $requete->closeCursor();
-
-        if ($existe) {
-            header('Location: /pages/register.php?erreur=existe');
-            exit();
-        }
-
-        // Insertion en base (requête préparée - cours slide 84)
-        $requete = $bdd->prepare(
-            'INSERT INTO users (nom, email, password_hash, role) VALUES (:nom, :email, :hash, :role)'
-        );
-        $requete->execute(array(
-            'nom'   => $nom,
-            'email' => $email,
-            'hash'  => password_hash($mdp, PASSWORD_DEFAULT),
-            'role'  => 'participant',
-        ));
-
-        header('Location: /pages/register.php?succes=1');
-        exit();
-
-    } else {
-        header('Location: /pages/register.php?erreur=vide');
-        exit();
-    }
-}
+<?php declare(strict_types=1);
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 $pageTitle = 'Inscription';
-include('../includes/header.php');
+
+$errors = [];
+
+$flash = flash_get();
+if (!empty($flash['error'])) {
+  $errors[] = (string)$flash['error'];
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  if (!csrf_verify()) {
+    $errors[] = 'Requête invalide (CSRF).';
+  } else {
+    $nom = trim((string)($_POST['nom'] ?? ''));
+    $email = strtolower(trim((string)($_POST['email'] ?? '')));
+
+    $password = (string)($_POST['password'] ?? '');
+    $role = (string)($_POST['role'] ?? '');
+
+
+  if ($nom === '' || mb_strlen($nom) > 100) {
+    $errors[] = 'Nom invalide.';
+  }
+  if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errors[] = 'Email invalide.';
+  }
+  if (mb_strlen($password) < 8) {
+    $errors[] = 'Mot de passe trop court (min 8 caractères).';
+  }
+  if (!in_array($role, ['participant', 'organisateur'], true)) {
+    $errors[] = 'Rôle invalide.';
+  }
+
+  if (!$errors) {
+    // Vérifie unicité email
+    $exists = db_single('SELECT id FROM users WHERE email = :email', [':email' => $email]);
+    if ($exists) {
+      $errors[] = 'Un compte existe déjà pour cet email.';
+    } else {
+      $hash = password_hash($password, PASSWORD_BCRYPT);
+      $associationId = null; // TODO Phase B si vous liez une association
+      $validated = 0;
+
+      db_execute(
+        "INSERT INTO users (role, association_id, nom, email, password_hash, photo_path, is_organisateur_validated)
+         VALUES (:role, :association_id, :nom, :email, :password_hash, NULL, :validated)",
+        [
+          ':role' => $role,
+          ':association_id' => $associationId,
+          ':nom' => $nom,
+          ':email' => $email,
+          ':password_hash' => $hash,
+          ':validated' => $validated,
+        ]
+      );
+
+      // Redirection vers connexion
+      header('Location: /pages/login.php');
+      exit;
+    }
+  }
+}
+}
+
+
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="login-box">
+
+<section class="container">
+  <h1 style="margin-top:0;">Inscription</h1>
+
+  <form method="POST" style="margin-top:16px; display:grid; gap:12px; max-width:520px;">
+    <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
+
+    <?php foreach ($errors as $err): ?>
+      <div style="padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background: rgba(255,0,0,.08);">
+        <?= e($err) ?>
+      </div>
+    <?php endforeach; ?>
+
+    <label style="display:grid; gap:6px;">
+      <span style="color: var(--muted); font-size:12px;">Nom</span>
+      <input name="nom" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
+    </label>
+
+    <label style="display:grid; gap:6px;">
+      <span style="color: var(--muted); font-size:12px;">Email</span>
+      <input type="email" name="email" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
+    </label>
 
     <div class="login-logo">OE</div>
 

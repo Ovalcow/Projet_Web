@@ -406,25 +406,17 @@ form .btn {
   margin-top: 40px;
 }
 
-.site-main {
-  padding: 20px 0 40px;
-  min-height: 60vh;
+site-footer{ 
+  border-top: 1px solid var(--border);
+  background: var(--card);
+  padding: 18px 0;
+  color: var(--muted);
 }
 
-/* ============  RESPONSIVE  ============ */
-@media screen and (min-width: 760px) {
-  .events-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  .event-card {
-    grid-template-columns: 160px 1fr;
-  }
-  .event-affiche {
-    width: 160px;
-    height: 160px;
-  }
-  .search-form {
-    grid-template-columns: 1.2fr .7fr .9fr .9fr auto;
-    align-items: end;
-  }
+
+@media(min-width: 760px){
+  .events-grid{ grid-template-columns: 1fr 1fr; }
+  .event-card{ grid-template-columns: 160px 1fr; }
+  .event-affiche{ width:160px; height:160px; }
+  .search-form{ grid-template-columns: 1.2fr .7fr .9fr .9fr auto; align-items:end; }
 }

@@ -1,5 +1,8 @@
-<?php
-include('../includes/auth.php');
+<?php declare(strict_types=1);
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/role_check.php';
+
 
 $pageTitle = 'Événements';
 
@@ -30,9 +33,12 @@ $sql = "SELECT e.id, e.titre, e.description, e.date_event, e.lieu, e.jauge_max,
 $params = array();
 
 if ($q !== '') {
-    $sql .= " AND (e.titre LIKE :q OR e.lieu LIKE :q OR e.description LIKE :q) ";
-    $params['q'] = '%' . $q . '%';
+  $sql .= " AND (e.titre LIKE :q_titre OR e.lieu LIKE :q_lieu OR e.description LIKE :q_description) ";
+  $params[':q_titre'] = '%' . $q . '%';
+  $params[':q_lieu'] = '%' . $q . '%';
+  $params[':q_description'] = '%' . $q . '%';
 }
+
 if ($date !== '') {
     $sql .= " AND e.date_event >= :d0 AND e.date_event < :d1 ";
     $params['d0'] = $date . ' 00:00:00';
@@ -113,8 +119,14 @@ include('../includes/header.php');
             </select>
         </label>
 
-        <button class="btn" type="submit">Rechercher</button>
-    </form>
+    <button class="btn" type="submit">Rechercher</button>
+  </form>
+
+  <?php if (!empty($currentUser) && user_is_organisateur()): ?>
+    <div style="margin: 8px 0 16px;">
+      <a class="btn btn-secondary" href="/pages/event_create.php">Créer un événement</a>
+    </div>
+  <?php endif; ?>
 
     <div class="events-grid">
         <?php if (empty($events)): ?>

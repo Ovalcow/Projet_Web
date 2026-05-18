@@ -1,91 +1,99 @@
-<?php
-session_start();
-include('../includes/db.php');
+<?php declare(strict_types=1);
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../includes/functions.php';
 
-// Vérifier si déjà connecté → redirection vers accueil
-$currentUser = null;
-if (isset($_SESSION['user_id'])) {
-    $requete = $bdd->prepare('SELECT id, nom, email, role FROM users WHERE id = ?');
-    $requete->execute(array($_SESSION['user_id']));
-    $currentUser = $requete->fetch();
-    $requete->closeCursor();
+$pageTitle = 'Connexion';
+
+$errors = [];
+
+$flash = flash_get();
+if (!empty($flash['error'])) {
+  $errors[] = (string)$flash['error'];
 }
 
-if ($currentUser) {
-    header('Location: /pages/index.php');
-    exit();
-}
-
-// Traitement du formulaire (méthode POST - TP9)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  if (!csrf_verify()) {
+    $errors[] = 'Requête invalide (CSRF).';
+  } else {
+    $email = strtolower(trim((string)($_POST['email'] ?? '')));
+    $password = (string)($_POST['password'] ?? '');
 
-    if (isset($_POST['email'], $_POST['mot_de_passe'])) {
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      $errors[] = 'Email invalide.';
+    } else {
+      $user = db_single(
+        "SELECT id, role, association_id, password_hash, nom, email, photo_path, is_organisateur_validated
+         FROM users WHERE email = :email",
+        [':email' => $email]
+      );
 
-        $email = htmlspecialchars($_POST['email']);
-        $mdp   = $_POST['mot_de_passe'];
-
-        // Requête préparée (cours slide 84)
-        $requete = $bdd->prepare('SELECT id, nom, email, password_hash, role FROM users WHERE email = :email');
-        $requete->execute(array('email' => $email));
-        $user = $requete->fetch();
-        $requete->closeCursor();
-
-        if ($user && password_verify($mdp, $user['password_hash'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['tentatives'] = 0;
-            header('Location: /pages/index.php');
-            exit();
-        }
-
-        // TP10 : compteur de tentatives
-        if (!isset($_SESSION['tentatives'])) {
-            $_SESSION['tentatives'] = 0;
+      if (!$user || empty($user['password_hash']) || !password_verify($password, (string)$user['password_hash'])) {
+        // Anti-bruteforce basique (TP9) : compteur + sleep après 3 tentatives
+        if (!isset($_SESSION['tentatives']) || !is_int($_SESSION['tentatives'])) {
+          $_SESSION['tentatives'] = 0;
         }
         $_SESSION['tentatives']++;
 
-        // TP10 : sleep(5) après 3 tentatives
         if ($_SESSION['tentatives'] >= 3) {
-            sleep(5);
-            $_SESSION['tentatives'] = 0;
+          sleep(5);
+          $_SESSION['tentatives'] = 0;
         }
 
-        header('Location: /pages/login.php?erreur=1');
-        exit();
+        $errors[] = 'Identifiants invalides.';
+      } else {
+        // Login OK
+        // On régénère l'ID de session pour limiter le session fixation
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+          @session_start();
+        }
+        @session_regenerate_id(true);
 
-    } else {
-        header('Location: /pages/login.php?erreur=1');
-        exit();
+        $_SESSION['user_id'] = (int)$user['id'];
+        $_SESSION['role'] = (string)$user['role'];
+        $_SESSION['association_id'] = $user['association_id'] !== null ? (int)$user['association_id'] : null;
+
+        // Redirection simple : profil
+        header('Location: /pages/profile.php');
+        exit;
+      }
     }
+  }
 }
 
-$pageTitle = 'Connexion';
-include('../includes/header.php');
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="login-box">
 
-    <div class="login-logo">OE</div>
+<section class="container">
 
-    <h1>Connexion</h1>
-    <p class="login-subtitle">Accédez à votre espace OmnesEvent</p>
+  <h1>Connexion</h1>
+  <form method="POST" style="margin-top:16px; display:grid; gap:12px; max-width:420px;">
+    <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
 
-    <?php if (isset($_GET['erreur'])): ?>
-        <p class="msg msg-error">Email ou mot de passe incorrect.</p>
-    <?php endif; ?>
+    <?php foreach ($errors as $err): ?>
+      <div style="padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background: rgba(255,0,0,.08);">
+        <?= e($err) ?>
+      </div>
+    <?php endforeach; ?>
 
-    <?php if (isset($_SESSION['tentatives']) && $_SESSION['tentatives'] > 0): ?>
-        <p class="msg msg-warning">Tentatives : <?php echo $_SESSION['tentatives']; ?></p>
-    <?php endif; ?>
+    <label style="display:grid; gap:6px;">
+      <span style="color: var(--muted); font-size:12px;">Email</span>
+      <input type="email" name="email" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
+    </label>
 
-    <form method="post" action="/pages/login.php">
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email" placeholder="votre@email.com" required />
+    <label style="display:grid; gap:6px;">
+      <span style="color: var(--muted); font-size:12px;">Mot de passe</span>
+      <input type="password" name="password" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
+    </label>
 
-        <label for="mot_de_passe">Mot de passe</label>
-        <input type="password" name="mot_de_passe" id="mot_de_passe" placeholder="Votre mot de passe" required />
+    <button class="btn btn-secondary" type="submit">Se connecter</button>
 
-        <button type="submit" class="btn">Se connecter</button>
-    </form>
+    <p style="margin: 10px 0 0; color: var(--muted); font-size: 13px;">
+      Pas encore de compte ?
+      <a href="/pages/register.php" style="color: var(--primary2); text-decoration: none; font-weight: 700;">Créer un compte</a>
+    </p>
+  </form>
+</section>
 
     <p class="form-footer">Pas encore de compte ? <a href="/pages/register.php">Créer un compte</a></p>
 </div>
