@@ -19,57 +19,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = strtolower(trim((string)($_POST['email'] ?? '')));
 
     $password = (string)($_POST['password'] ?? '');
+    $confirmPassword = (string)($_POST['confirm_password'] ?? ($_POST['confirm_mdp'] ?? ''));
     $role = (string)($_POST['role'] ?? '');
 
+    if ($nom === '' || mb_strlen($nom) > 100) {
+      $errors[] = 'Nom invalide.';
+    }
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      $errors[] = 'Email invalide.';
+    }
+    if (mb_strlen($password) < 8) {
+      $errors[] = 'Mot de passe trop court (min 8 caractères).';
+    }
+    if ($password !== $confirmPassword) {
+      $errors[] = 'Les mots de passe ne correspondent pas.';
+    }
+    if (!in_array($role, ['participant', 'organisateur'], true)) {
+      $errors[] = 'Rôle invalide.';
+    }
 
-  if ($nom === '' || mb_strlen($nom) > 100) {
-    $errors[] = 'Nom invalide.';
-  }
-  if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errors[] = 'Email invalide.';
-  }
-  if (mb_strlen($password) < 8) {
-    $errors[] = 'Mot de passe trop court (min 8 caractères).';
-  }
-  if (!in_array($role, ['participant', 'organisateur'], true)) {
-    $errors[] = 'Rôle invalide.';
-  }
+    if (!$errors) {
+      // Vérifie unicité email
+      $exists = db_single('SELECT id FROM users WHERE email = :email', [':email' => $email]);
+      if ($exists) {
+        $errors[] = 'Un compte existe déjà pour cet email.';
+      } else {
+        $hash = password_hash($password, PASSWORD_BCRYPT);
+        $associationId = null; // TODO Phase B si vous liez une association
+        $validated = 0;
 
-  if (!$errors) {
-    // Vérifie unicité email
-    $exists = db_single('SELECT id FROM users WHERE email = :email', [':email' => $email]);
-    if ($exists) {
-      $errors[] = 'Un compte existe déjà pour cet email.';
-    } else {
-      $hash = password_hash($password, PASSWORD_BCRYPT);
-      $associationId = null; // TODO Phase B si vous liez une association
-      $validated = 0;
+        db_execute(
+          "INSERT INTO users (role, association_id, nom, email, password_hash, photo_path, is_organisateur_validated)
+           VALUES (:role, :association_id, :nom, :email, :password_hash, NULL, :validated)",
+          [
+            ':role' => $role,
+            ':association_id' => $associationId,
+            ':nom' => $nom,
+            ':email' => $email,
+            ':password_hash' => $hash,
+            ':validated' => $validated,
+          ]
+        );
 
-      db_execute(
-        "INSERT INTO users (role, association_id, nom, email, password_hash, photo_path, is_organisateur_validated)
-         VALUES (:role, :association_id, :nom, :email, :password_hash, NULL, :validated)",
-        [
-          ':role' => $role,
-          ':association_id' => $associationId,
-          ':nom' => $nom,
-          ':email' => $email,
-          ':password_hash' => $hash,
-          ':validated' => $validated,
-        ]
-      );
-
-      // Redirection vers connexion
-      header('Location: /pages/login.php');
-      exit;
+        header('Location: /pages/login.php');
+        exit;
+      }
     }
   }
 }
-}
-
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
-
 
 <section class="container">
   <h1 style="margin-top:0;">Inscription</h1>
@@ -96,6 +96,11 @@ require_once __DIR__ . '/../includes/header.php';
     <label style="display:grid; gap:6px;">
       <span style="color: var(--muted); font-size:12px;">Mot de passe</span>
       <input type="password" name="password" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
+    </label>
+
+    <label style="display:grid; gap:6px;">
+      <span style="color: var(--muted); font-size:12px;">Confirmer le mot de passe</span>
+      <input type="password" name="confirm_password" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
     </label>
 
     <label style="display:grid; gap:6px;">

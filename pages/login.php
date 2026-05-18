@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       );
 
       if (!$user || empty($user['password_hash']) || !password_verify($password, (string)$user['password_hash'])) {
-        // Anti-bruteforce basique (TP9) : compteur + sleep après 3 tentatives
+        // Anti-bruteforce basique : compteur + sleep après 3 tentatives
         if (!isset($_SESSION['tentatives']) || !is_int($_SESSION['tentatives'])) {
           $_SESSION['tentatives'] = 0;
         }

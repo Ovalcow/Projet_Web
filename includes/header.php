@@ -22,9 +22,15 @@ require_once __DIR__ . '/role_check.php';
       <nav class="nav">
         <a class="nav-link" href="/pages/events.php">Événements</a>
         <a class="nav-link" href="/pages/profile.php">Mon profil</a>
-<?php if (!empty($currentUser) && user_is_organisateur()): ?>
+
+        <?php if (!empty($currentUser) && user_is_admin()): ?>
+          <a class="nav-link" href="/pages/admin/dashboard.php">Admin</a>
+        <?php endif; ?>
+
+        <?php if (!empty($currentUser) && user_is_organisateur()): ?>
           <a class="nav-link" href="/pages/event_create.php">Créer événement</a>
         <?php endif; ?>
+
         <?php if (!empty($currentUser)): ?>
           <a class="nav-link" href="/pages/logout.php">Déconnexion</a>
         <?php else: ?>
