@@ -25,7 +25,7 @@ body {
   background: var(--bg);
   color: var(--highlight);
 }
-
+/*login.php*/
 .container {
   width: 100%;
   padding: 0 16px;
@@ -37,6 +37,25 @@ body {
   color: var(--text);
   border: 1px solid var(--text);
 }
+.message_erreur {
+  padding:10px; 
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px; 
+  background: rgba(255,0,0,.08);
+}
+.email_login {
+  display:grid; 
+  gap:6px;
+}
+.login_form input {
+  padding:10px 12px; 
+  border-radius:10px; 
+  border:1px solid var(--highlight); 
+  background: var(--bg); 
+  color: var(--text);
+}
+
+/*fin login.php*/
 
 .site-header {
   position: sticky;
@@ -247,83 +266,3 @@ body {
   }
 }
 
-/* Styles spécifiques au carrousel d'événements */
-.carrousel-events {
-  position: relative;
-  max-width: 900px;
-  margin: 30px auto;
-}
-
-.event-slide {
-  display: none;
-}
-
-.event-slide.active {
-  display: block;
-}
-
-
-.carrousel-controls button {
-  padding: 10px 16px;
-  cursor: pointer;
-  color: var(--text);
-  background: var(--highlight);
-  border-radius: var(--radius);
-}
-
-.carrousel {
-  position: relative;
-  width: 90%;
-  max-width: 1200px;
-  margin: 30px auto;
-}
-
-#prev,
-#suiv {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-
-  width: 60px;
-  height: 60px;
-
-  border: none;
-  border-radius: 25%;
-
-  background: var(--highlight);
-  color: var(--text);
-
-  cursor: pointer;
-
-  z-index: 5;
-}
-
-#prev {
-  left: -75px;
-}
-
-#suiv {
-  right: -75px;
-}
-
-.carrousel-points {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 15px;
-}
-
-.point {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 0;
-  background: var(--text);
-  cursor: pointer;
-}
-
-.point.active {
-  background: var(--highlight);
-}
-
-/*fin carrousel*/

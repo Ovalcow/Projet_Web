@@ -70,19 +70,19 @@ require_once __DIR__ . '/../includes/header.php';
   <form  class="login-form" method="POST" style="margin-top:16px; display:grid; gap:12px; max-width:420px;">
     <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>" />
     <?php foreach ($errors as $err): ?>
-      <div style="padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:12px; background: rgba(255,0,0,.08);">
+      <div class="message_erreur" >
         <?= e($err) ?>
       </div>
     <?php endforeach; ?>
 
-    <label style="display:grid; gap:6px;">
+    <label class="email_login">
       <span style="color: var(--muted); font-size:12px;">Email</span>
-      <input type="email" name="email" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
+      <input type="email" name="email"/>
     </label>
 
-    <label style="display:grid; gap:6px;">
+    <label class="password_login">
       <span style="color: var(--muted); font-size:12px;">Mot de passe</span>
-      <input type="password" name="password" required style="padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text);" />
+      <input type="password" name="password"/>
     </label>
 
     <button class="btn btn-secondary" type="submit">Se connecter</button>

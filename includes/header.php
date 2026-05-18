@@ -9,6 +9,7 @@ require_once __DIR__ . '/role_check.php';
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><?= isset($pageTitle) ? e($pageTitle) : 'OmnesEvent' ?></title>
   <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo time(); ?>" />
+  <link rel="stylesheet" href="/assets/css/index.css?v=<?php echo time(); ?>" />
 </head>
 
 <body>

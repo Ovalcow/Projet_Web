@@ -1,0 +1,80 @@
+/* Styles spécifiques au carrousel d'événements */
+.carrousel-events {
+  position: relative;
+  max-width: 900px;
+  margin: 30px auto;
+}
+
+.event-slide {
+  display: none;
+}
+
+.event-slide.active {
+  display: block;
+}
+
+
+.carrousel-controls button {
+  padding: 10px 16px;
+  cursor: pointer;
+  color: var(--text);
+  background: var(--highlight);
+  border-radius: var(--radius);
+}
+
+.carrousel {
+  position: relative;
+  width: 90%;
+  max-width: 1200px;
+  margin: 30px auto;
+}
+
+#prev,
+#suiv {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 60px;
+  height: 60px;
+
+  border: none;
+  border-radius: 25%;
+
+  background: var(--highlight);
+  color: var(--text);
+
+  cursor: pointer;
+
+  z-index: 5;
+}
+
+#prev {
+  left: -75px;
+}
+
+#suiv {
+  right: -75px;
+}
+
+.carrousel-points {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.point {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--text);
+  cursor: pointer;
+}
+
+.point.active {
+  background: var(--highlight);
+}
+
+/*fin carrousel*/
