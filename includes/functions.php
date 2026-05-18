@@ -1,12 +1,10 @@
 <?php
 // Fonctions utilitaires
-
 // Redirection simple
 function redirect($url) {
     header('Location: ' . $url);
     exit();
 }
-
 // Message flash en session (pour afficher après redirection)
 function flash($type, $message) {
     $_SESSION['flash'] = array('type' => $type, 'message' => $message);
