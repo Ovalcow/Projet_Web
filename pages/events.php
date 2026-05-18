@@ -21,6 +21,7 @@ $params = [];
 
 if ($q !== '') {
   $sql .= " AND (e.titre LIKE :q_titre OR e.lieu LIKE :q_lieu OR e.description LIKE :q_description) ";
+  
   $params[':q_titre'] = '%' . $q . '%';
   $params[':q_lieu'] = '%' . $q . '%';
   $params[':q_description'] = '%' . $q . '%';
