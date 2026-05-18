@@ -3,6 +3,8 @@ require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/functions.php';
 
+require_login();
+
 $pageTitle = 'Vérification billet';
 
 $reservationId = (int)($_GET['reservation_id'] ?? 0);
@@ -23,8 +25,8 @@ $booking = db_single(
    FROM reservations r
    JOIN events e ON e.id = r.event_id
    JOIN users u ON u.id = r.participant_id
-   WHERE r.id = :rid",
-  [':rid' => $reservationId]
+   WHERE r.id = :rid AND r.participant_id = :participant_id",
+  [':rid' => $reservationId, ':participant_id' => (int)$currentUser['id']]
 );
 
 if ($booking) {

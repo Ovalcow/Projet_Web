@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: May 13, 2026 at 08:17 AM
+-- Generation Time: May 18, 2026 at 11:53 AM
 -- Server version: 8.4.7
 -- PHP Version: 8.3.28
 
@@ -94,7 +94,16 @@ CREATE TABLE IF NOT EXISTS `events` (
   KEY `idx_events_assoc` (`association_id`),
   KEY `idx_events_category` (`category_id`),
   KEY `fk_events_organizer` (`organizer_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `events`
+--
+
+INSERT INTO `events` (`id`, `organizer_id`, `association_id`, `category_id`, `titre`, `description`, `date_event`, `lieu`, `jauge_max`, `affiche_path`, `created_at`, `updated_at`) VALUES
+(1, 4, 2, 2, 'test', 'ceci est un test', '2026-08-19 10:30:00', '19 rue machin', 5, '726634_e7142e4b9d948553.jpg', '2026-05-15 18:20:19', NULL),
+(2, 4, 1, 3, 'démo', 'ceci est une démo', '2192-05-15 01:15:00', 'AZERTYUI', 1000000, 'Screenshot-2025-09-22-191450_a18fcc1eb3fc4264.png', '2026-05-15 19:14:44', NULL),
+(3, 4, 1, 1, '2 test', 'azerty', '2026-12-12 17:15:00', '19 Rue Salomon Reinach, Lyon', 1, NULL, '2026-05-16 09:00:54', NULL);
 
 -- --------------------------------------------------------
 
@@ -113,7 +122,17 @@ CREATE TABLE IF NOT EXISTS `reservations` (
   UNIQUE KEY `uq_reservation_event_participant` (`event_id`,`participant_id`),
   KEY `idx_reservations_event` (`event_id`),
   KEY `idx_reservations_participant` (`participant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `reservations`
+--
+
+INSERT INTO `reservations` (`id`, `event_id`, `participant_id`, `created_at`, `presence_status`) VALUES
+(1, 1, 2, '2026-05-15 18:35:42', 'pending'),
+(2, 2, 4, '2026-05-15 19:15:17', 'pending'),
+(3, 1, 4, '2026-05-15 20:00:50', 'pending'),
+(4, 3, 4, '2026-05-16 09:00:56', 'pending');
 
 -- --------------------------------------------------------
 
@@ -136,7 +155,17 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY `uq_users_email` (`email`),
   KEY `idx_users_role` (`role`),
   KEY `idx_users_association` (`association_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `role`, `association_id`, `nom`, `email`, `password_hash`, `photo_path`, `is_organisateur_validated`, `created_at`) VALUES
+(2, 'participant', NULL, 'Andine-Allard', 'samuel.allard2006@gmail.com', '$2y$10$iphaWWofpbF1o30ZKAPxFOsnrBSa/OitAeLSw3JP2sFf/vbDqjqhK', NULL, 0, '2026-05-15 14:34:12'),
+(3, 'organisateur', NULL, 'Dupont', 'dupont@gmail.com', '$2y$10$YVlA79gMy8bWLVLGxY2g7.BelaCoMWswouCtM6tt/Ej8kElZkrbNS', NULL, 0, '2026-05-15 17:32:04'),
+(4, 'organisateur', NULL, 'jesuis', 'je@gmail.com', '$2y$10$CeqwubsyZQoiIVVe3p0zUeRpa8mSKfioqBcakVlahH2Vj9R/i3M0u', NULL, 0, '2026-05-15 18:18:17'),
+(5, 'organisateur', NULL, 'nel', 'nel@gmail.com', '$2y$10$VnjBeJVb8zT.1qDbHlF5dOXcfmSVebVWPD7h23NNRD8GVBbYKLesG', NULL, 0, '2026-05-18 11:02:36');
 
 --
 -- Constraints for dumped tables

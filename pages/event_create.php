@@ -6,11 +6,19 @@ require_once __DIR__ . '/../includes/role_check.php';
 
 $pageTitle = 'Créer un événement';
 
-// Accès: organisateur (ou admin)
+// Accès: organisateur validé (ou admin)
 if (empty($currentUser) || !in_array($currentUser['role'], ['organisateur','admin'], true)) {
   $_SESSION['flash'] = $_SESSION['flash'] ?? [];
   $_SESSION['flash']['error'] = 'Accès interdit : vous devez être organisateur.';
   header('Location: /pages/login.php');
+  exit;
+}
+
+// Pour un rôle organisateur, exiger la validation
+if (!empty($currentUser) && $currentUser['role'] === 'organisateur' && empty($currentUser['is_organisateur_validated'])) {
+  $_SESSION['flash'] = $_SESSION['flash'] ?? [];
+  $_SESSION['flash']['error'] = 'Accès interdit : compte organisateur non validé.';
+  header('Location: /pages/index.php');
   exit;
 }
 

@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../includes/init.php';
 
 // Déconnexion : purge session et redirection.
-@session_start();
 $_SESSION = [];
 @session_destroy();
 
