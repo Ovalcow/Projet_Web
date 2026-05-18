@@ -8,6 +8,7 @@
 // doivent inclure ce fichier (directement ou indirectement via pages).
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/sanitize.php';
 
 // Durcissement session (avant session_start)
 $cookieParams = [
