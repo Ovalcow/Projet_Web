@@ -428,3 +428,25 @@ form .btn {
     align-items: end;
   }
 }
+/* ============  SHOW PASSWORD CHECKBOX  ============ */
+.show-password-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: none;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.show-password-label input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+.login-box .show-password-label {
+  margin: 8px 0 0;
+}
