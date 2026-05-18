@@ -1,8 +1,4 @@
 <?php
-/**
- * pages/reservations/annuler.php
- * Annule la réservation du participant connecté.
- */
 declare(strict_types=1);
 
 include('../../config/init.php');
@@ -13,31 +9,25 @@ if (function_exists('require_login')) {
     require_login();
 }
 
-function reservation_flash(string $type, string $message): void
-{
+function reservation_flash(string $type, string $message): void {
     if (function_exists('flash')) {
         flash($type, $message);
-        return;
+    } else {
+        $_SESSION['flash'][$type] = $message;
     }
-
-    $_SESSION['flash'] = $_SESSION['flash'] ?? [];
-    $_SESSION['flash'][$type] = $message;
 }
 
-function reservation_redirect(string $url): void
-{
+function reservation_redirect(string $url): void {
     if (function_exists('redirect')) {
         redirect($url);
     }
-
     header('Location: ' . $url);
     exit;
 }
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-$eventId = $method === 'POST'
-    ? (int)($_POST['event_id'] ?? 0)
-    : (int)($_GET['event_id'] ?? 0);
+$eventId = $method === 'POST' ? (int)($_POST['event_id'] ?? 0) : (int)($_GET['event_id'] ?? 0);
+$userId = (int)($currentUser['id'] ?? 0);
 
 if ($eventId <= 0) {
     reservation_flash('error', 'ID événement invalide.');
@@ -45,11 +35,9 @@ if ($eventId <= 0) {
 }
 
 if ($method === 'POST' && function_exists('csrf_verify') && !csrf_verify()) {
-    reservation_flash('error', 'Requête invalide. Merci de réessayer.');
+    reservation_flash('error', 'Requête invalide.');
     reservation_redirect('/pages/events/detail.php?id=' . $eventId);
 }
-
-$userId = (int)($currentUser['id'] ?? 0);
 
 $stmt = $bdd->prepare(
     'DELETE FROM reservations
@@ -65,7 +53,7 @@ $stmt->execute([
 if ($stmt->rowCount() > 0) {
     reservation_flash('success', 'Réservation annulée.');
 } else {
-    reservation_flash('warning', 'Aucune réservation à annuler pour cet événement.');
+    reservation_flash('warning', 'Aucune réservation à annuler.');
 }
 
 reservation_redirect('/pages/events/detail.php?id=' . $eventId);

@@ -1,8 +1,4 @@
 <?php
-/**
- * pages/reservations/inscrits.php
- * Liste les inscrits à un événement pour l'organisateur propriétaire ou l'admin.
- */
 declare(strict_types=1);
 
 include('../../config/init.php');
@@ -11,23 +7,16 @@ include('../../includes/functions.php');
 
 $pageTitle = 'Inscrits événement';
 
-function oh(string $value): string
-{
+function h(string $value): string {
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-function can_manage_event(array $event, array $user): bool
-{
+function can_manage_event(array $event, array $user): bool {
     $role = (string)($user['role'] ?? '');
-    if ($role === 'admin') {
-        return true;
-    }
-
-    return $role === 'organisateur' && (int)($event['organizer_id'] ?? 0) === (int)($user['id'] ?? 0);
+    return $role === 'admin' || ($role === 'organisateur' && (int)$event['organizer_id'] === (int)($user['id'] ?? 0));
 }
 
-function table_has_column(PDO $bdd, string $table, string $column): bool
-{
+function table_has_column_local(PDO $bdd, string $table, string $column): bool {
     try {
         $stmt = $bdd->prepare(
             "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
@@ -69,58 +58,56 @@ if (!can_manage_event($event, $currentUser ?? [])) {
     exit;
 }
 
-$hasPresenceStatus = table_has_column($bdd, 'reservations', 'presence_status');
-$presenceSelect = $hasPresenceStatus ? ', r.presence_status' : '';
+$hasPresence = table_has_column_local($bdd, 'reservations', 'presence_status');
 
-$stmt = $bdd->prepare(
-    "SELECT r.id AS reservation_id,
-            r.created_at,
-            u.id AS user_id,
-            u.nom,
-            u.email
-            $presenceSelect
-     FROM reservations r
-     JOIN users u ON u.id = r.participant_id
-     WHERE r.event_id = :event_id
-     ORDER BY r.created_at ASC, u.nom ASC"
-);
+$sql = "SELECT r.id AS reservation_id,
+               r.created_at,
+               " . ($hasPresence ? "r.presence_status," : "'unknown' AS presence_status,") . "
+               u.id AS user_id,
+               u.nom,
+               u.email
+        FROM reservations r
+        JOIN users u ON u.id = r.participant_id
+        WHERE r.event_id = :event_id
+        ORDER BY r.created_at ASC, r.id ASC";
+$stmt = $bdd->prepare($sql);
 $stmt->execute(['event_id' => $eventId]);
-$inscrits = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt->closeCursor();
 
 include('../../includes/header.php');
 ?>
-<section class="container">
-    <h1>Inscrits — <?= oh((string)$event['titre']) ?></h1>
-    <p>📅 <?= oh(date('d/m/Y H:i', strtotime((string)$event['date_event']))) ?></p>
-    <p><strong><?= count($inscrits) ?></strong> inscrit(s)</p>
 
-    <?php if (empty($inscrits)): ?>
+<section class="container">
+    <h1>Inscrits — <?= h((string)$event['titre']) ?></h1>
+    <p>Nombre d’inscrits : <strong><?= count($rows) ?></strong></p>
+
+    <?php if (empty($rows)): ?>
         <p>Aucun inscrit pour le moment.</p>
     <?php else: ?>
-        <div style="overflow-x:auto;">
+        <div style="overflow:auto;">
             <table style="width:100%; border-collapse:collapse;">
                 <thead>
                     <tr>
-                        <th style="text-align:left; padding:10px; border-bottom:1px solid var(--border);">#</th>
-                        <th style="text-align:left; padding:10px; border-bottom:1px solid var(--border);">Participant</th>
+                        <th style="text-align:left; padding:10px; border-bottom:1px solid var(--border);">Nom</th>
                         <th style="text-align:left; padding:10px; border-bottom:1px solid var(--border);">Email</th>
                         <th style="text-align:left; padding:10px; border-bottom:1px solid var(--border);">Réservation</th>
-                        <?php if ($hasPresenceStatus): ?>
+                        <th style="text-align:left; padding:10px; border-bottom:1px solid var(--border);">Date inscription</th>
+                        <?php if ($hasPresence): ?>
                             <th style="text-align:left; padding:10px; border-bottom:1px solid var(--border);">Présence</th>
                         <?php endif; ?>
-                        <th style="text-align:left; padding:10px; border-bottom:1px solid var(--border);">QR</th>
+                        <th style="text-align:left; padding:10px; border-bottom:1px solid var(--border);">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($inscrits as $index => $row): ?>
+                    <?php foreach ($rows as $row): ?>
                         <tr>
-                            <td style="padding:10px; border-bottom:1px solid var(--border);"><?= $index + 1 ?></td>
-                            <td style="padding:10px; border-bottom:1px solid var(--border);"><?= oh((string)$row['nom']) ?></td>
-                            <td style="padding:10px; border-bottom:1px solid var(--border);"><?= oh((string)$row['email']) ?></td>
+                            <td style="padding:10px; border-bottom:1px solid var(--border);"><?= h((string)$row['nom']) ?></td>
+                            <td style="padding:10px; border-bottom:1px solid var(--border);"><?= h((string)$row['email']) ?></td>
                             <td style="padding:10px; border-bottom:1px solid var(--border);">#<?= (int)$row['reservation_id'] ?></td>
-                            <?php if ($hasPresenceStatus): ?>
-                                <td style="padding:10px; border-bottom:1px solid var(--border);"><?= oh((string)($row['presence_status'] ?? 'pending')) ?></td>
+                            <td style="padding:10px; border-bottom:1px solid var(--border);"><?= h((string)($row['created_at'] ?? '')) ?></td>
+                            <?php if ($hasPresence): ?>
+                                <td style="padding:10px; border-bottom:1px solid var(--border);"><?= h((string)$row['presence_status']) ?></td>
                             <?php endif; ?>
                             <td style="padding:10px; border-bottom:1px solid var(--border);">
                                 <a class="btn btn-secondary" href="/pages/reservations/billet_verify.php?reservation_id=<?= (int)$row['reservation_id'] ?>">Vérifier</a>
@@ -136,4 +123,5 @@ include('../../includes/header.php');
         <a class="btn btn-secondary" href="/pages/events/detail.php?id=<?= (int)$eventId ?>">Retour événement</a>
     </div>
 </section>
+
 <?php include('../../includes/footer.php'); ?>
