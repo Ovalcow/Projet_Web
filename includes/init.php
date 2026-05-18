@@ -40,10 +40,13 @@ if (!empty($_SESSION['user_id']) && is_numeric($_SESSION['user_id'])) {
   if ($user) {
     $currentUser = $user;
   } else {
-    // session invalide -> on purge
+    // session invalide -> purge cohérente + restart session
     $_SESSION = [];
+    @session_destroy();
+    @session_start();
   }
 }
+
 
 // Helper: flash messages
 if (empty($_SESSION['flash'])) {

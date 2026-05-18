@@ -28,6 +28,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       );
 
       if (!$user || empty($user['password_hash']) || !password_verify($password, (string)$user['password_hash'])) {
+        // Anti-bruteforce basique (TP9) : compteur + sleep après 3 tentatives
+        if (!isset($_SESSION['tentatives']) || !is_int($_SESSION['tentatives'])) {
+          $_SESSION['tentatives'] = 0;
+        }
+        $_SESSION['tentatives']++;
+
+        if ($_SESSION['tentatives'] >= 3) {
+          sleep(5);
+          $_SESSION['tentatives'] = 0;
+        }
+
         $errors[] = 'Identifiants invalides.';
       } else {
         // Login OK
